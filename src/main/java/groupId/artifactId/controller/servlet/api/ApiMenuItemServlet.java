@@ -1,10 +1,7 @@
 package groupId.artifactId.controller.servlet.api;
 
-import groupId.artifactId.config.AppContext;
-import groupId.artifactId.controller.utils.JsonConverter;
 import groupId.artifactId.controller.validator.MenuItemValidator;
 import groupId.artifactId.controller.validator.api.IMenuItemValidator;
-import groupId.artifactId.core.Constants;
 import groupId.artifactId.core.dto.input.MenuItemDtoInput;
 import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.exceptions.NoContentException;
@@ -12,152 +9,115 @@ import groupId.artifactId.service.MenuItemService;
 import groupId.artifactId.service.api.IMenuItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.OptimisticLockException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 //CRUD controller
 //IMenuItem
-@WebServlet(name = "MenuItem", urlPatterns = "/api/menu_item")
-public class ApiMenuItemServlet extends HttpServlet {
+@RestController
+@RequestMapping("/api/menu_item")
+public class ApiMenuItemServlet {
     private final IMenuItemService menuItemService;
     private final IMenuItemValidator menuItemValidator;
     private final Logger logger;
-    private final JsonConverter jsonConverter;
-    public ApiMenuItemServlet() {
-        AnnotationConfigApplicationContext context = AppContext.getContext();
-        this.menuItemService = context.getBean(MenuItemService.class);
-        this.menuItemValidator = context.getBean(MenuItemValidator.class);
+
+    public ApiMenuItemServlet(MenuItemService menuItemService, MenuItemValidator menuItemValidator) {
+        this.menuItemService = menuItemService;
+        this.menuItemValidator = menuItemValidator;
         this.logger = LoggerFactory.getLogger(this.getClass());
-        this.jsonConverter = context.getBean(JsonConverter.class);
     }
 
     //Read POSITION
     //1) Read list
-    //2) Read item need id param  (id = 93)
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    //2) Read item need id param
+    @GetMapping
+    @RequestMapping("/{id}")
+    protected ResponseEntity<MenuItemDtoOutput> get(@PathVariable long id) {
         try {
-            String id = req.getParameter(Constants.PARAMETER_ID);
-            if (id != null) {
-                resp.getWriter().write(jsonConverter.fromMenuItemToJson(menuItemService.get(Long.valueOf(id))));
-            } else {
-                resp.getWriter().write(jsonConverter.fromMenuItemListToJson(menuItemService.get()));
-            }
-            resp.setStatus(HttpServletResponse.SC_OK);
+            return ResponseEntity.ok(menuItemService.get(id));
         } catch (NoContentException e) {
-            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            logger.error("/api/menu_item there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause() +
-                    "\tresponse status: " + resp.getStatus());
+            logger.error("/api/menu_item there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            logger.error("/api/menu_item crashed during doGet method" + e.getMessage() + "\t" + e.getCause() +
-                    "\tresponse status: " + resp.getStatus());
+            logger.error("/api/menu_item crashed during doGet method" + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //Read POSITION
+    //1) Read list
+    //2) Read item need id param
+    @GetMapping
+    protected ResponseEntity<List<MenuItemDtoOutput>> getList() {
+        try {
+            return ResponseEntity.ok(menuItemService.get());
+        } catch (NoContentException e) {
+            logger.error("/api/menu_item there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            logger.error("/api/menu_item crashed during doGet method" + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     //CREATE POSITION
     //body json
-//   {
-//           "price":20.0,
-//           "pizza_info_id":123,
-//           "menu_id":1
-//           }
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    @PostMapping
+    protected ResponseEntity<MenuItemDtoOutput> post(@RequestBody MenuItemDtoInput dtoInput) {
         try {
-            MenuItemDtoInput menuItemDtoInput = jsonConverter.fromJsonToMenuItem(req.getInputStream());
-            try {
-                menuItemValidator.validate(menuItemDtoInput);
-            } catch (IllegalArgumentException e) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                logger.error("/api/menu_item input is not valid " + e.getMessage() + "\t" + e.getCause() +
-                        "\tresponse status: " + resp.getStatus());
-            }
-            MenuItemDtoOutput dtoCrudOutput = menuItemService.save(menuItemDtoInput);
-            resp.getWriter().write(jsonConverter.fromMenuItemToJson(dtoCrudOutput));
-            resp.setStatus(HttpServletResponse.SC_CREATED);
+            menuItemValidator.validate(dtoInput); // TODO
+            return ResponseEntity.ok(this.menuItemService.save(dtoInput));
         } catch (NoContentException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            logger.error("/api/menu_item there is no content to fulfill doPost method " + e.getMessage() + "\t" + e.getCause() +
-                    "\tresponse status: " + resp.getStatus());
+            logger.error("/api/menu_item there is no content to fulfill doPost method " + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            logger.error("/api/menu_item crashed during doPost method" + e.getMessage() + "\t" + e.getCause() +
-                    "\tresponse status: " + resp.getStatus());
+            logger.error("/api/menu_item crashed during doPost method" + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     //UPDATE POSITION
-    //need param id  (id = 93)
-    //need param version/date_update - optimistic lock (version=1)
+    //need param id
+    //need param version/date_update - optimistic lock
     //body json
-//   {
-//           "price":25.0,
-//           "pizza_info_id":123,
-//           "menu_id":1
-//           }
-    @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
+    @PutMapping
+    @RequestMapping("/{id}/version/{version}")
+    protected ResponseEntity<MenuItemDtoOutput> put(@PathVariable long id, @PathVariable("version") int version,
+                                                    @RequestBody MenuItemDtoInput dtoInput) {
         try {
-            String id = req.getParameter(Constants.PARAMETER_ID);
-            String version = req.getParameter(Constants.PARAMETER_VERSION);
-            if (id != null && version != null) {
-                MenuItemDtoInput dtoInput = jsonConverter.fromJsonToMenuItem(req.getInputStream());
-                try {
-                    menuItemValidator.validate(dtoInput);
-                } catch (IllegalArgumentException e) {
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    logger.error("/api/menu_item input is not valid " + e.getMessage() + "\t" + e.getCause() +
-                            "\tresponse status: " + resp.getStatus());
-                }
-                MenuItemDtoOutput crudOutput = menuItemService.update(dtoInput, id, version);
-                resp.getWriter().write(jsonConverter.fromMenuItemToJson(crudOutput));
-                resp.setStatus(HttpServletResponse.SC_CREATED);
-            } else {
-                resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
-            }
+            menuItemValidator.validate(dtoInput); // TODO
+            return ResponseEntity.ok(this.menuItemService.update(dtoInput, String.valueOf(id), String.valueOf(version)));
         } catch (NoContentException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            logger.error("/api/menu_item there is no content to fulfill doPut method " + e.getMessage() + "\t" + e.getCause() +
-                    "\tresponse status: " + resp.getStatus());
+            logger.error("/api/menu_item there is no content to fulfill doPut method " + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (OptimisticLockException e) {
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
-            logger.error("/api/menu_item optimistic lock during doPut method" + e.getMessage() + "\t" + e.getCause() +
-                    "\tresponse status: " + resp.getStatus());
+            logger.error("/api/menu_item optimistic lock during doPut method" + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            logger.error("/api/menu_item crashed during doPut method" + e.getMessage() + "\t" + e.getCause() +
-                    "\tresponse status: " + resp.getStatus());
+            logger.error("/api/menu_item crashed during doPut method" + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     //DELETE POSITION
-    //need param id  (id = 76)
-    //param delete - true completely delete/false delete menu_id (delete=false)
-    @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+    //need param id
+    //param delete - true completely delete/false delete menu_id
+    @DeleteMapping
+    @RequestMapping("/{id}/delete/{delete}")
+    protected ResponseEntity<Object> delete(@PathVariable long id, @PathVariable("delete") boolean delete) {
         try {
-            String id = req.getParameter(Constants.PARAMETER_ID);
-            String delete = req.getParameter(Constants.PARAMETER_DELETE);
-            if (id != null && delete != null) {
-                menuItemService.delete(id, delete);
-                resp.setStatus(HttpServletResponse.SC_OK);
-            } else {
-                resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
-            }
+            menuItemService.delete(String.valueOf(id), String.valueOf(delete));
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (NoContentException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            logger.error("/api/menu_item there is no content to fulfill doDelete method " + e.getMessage() + "\t" + e.getCause() +
-                    "\tresponse status: " + resp.getStatus());
+            logger.error("/api/menu_item there is no content to fulfill doDelete method " + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            logger.error("/api/menu_item crashed during doDelete method" + e.getMessage() + "\t" + e.getCause() +
-                    "\tresponse status: " + resp.getStatus());
+            logger.error("/api/menu_item crashed during doDelete method" + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
