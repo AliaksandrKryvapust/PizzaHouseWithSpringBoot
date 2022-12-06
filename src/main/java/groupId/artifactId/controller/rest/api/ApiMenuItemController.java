@@ -1,14 +1,13 @@
 package groupId.artifactId.controller.rest.api;
 
-import groupId.artifactId.controller.validator.MenuItemValidator;
 import groupId.artifactId.controller.validator.api.IMenuItemValidator;
 import groupId.artifactId.core.dto.input.MenuItemDtoInput;
 import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.exceptions.NoContentException;
-import groupId.artifactId.service.MenuItemService;
 import groupId.artifactId.service.api.IMenuItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,17 +24,16 @@ public class ApiMenuItemController {
     private final IMenuItemValidator menuItemValidator;
     private final Logger logger;
 
-    public ApiMenuItemController(MenuItemService menuItemService, MenuItemValidator menuItemValidator) {
+    @Autowired
+    public ApiMenuItemController(IMenuItemService menuItemService, IMenuItemValidator menuItemValidator) {
         this.menuItemService = menuItemService;
         this.menuItemValidator = menuItemValidator;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
     //Read POSITION
-    //1) Read list
-    //2) Read item need id param
-    @GetMapping
-    @RequestMapping("/{id}")
+    //1) Read item need id param
+    @GetMapping("/{id}")
     protected ResponseEntity<MenuItemDtoOutput> get(@PathVariable long id) {
         try {
             return ResponseEntity.ok(menuItemService.get(id));
@@ -50,7 +48,6 @@ public class ApiMenuItemController {
 
     //Read POSITION
     //1) Read list
-    //2) Read item need id param
     @GetMapping
     protected ResponseEntity<List<MenuItemDtoOutput>> getList() {
         try {
@@ -84,8 +81,7 @@ public class ApiMenuItemController {
     //need param id
     //need param version/date_update - optimistic lock
     //body json
-    @PutMapping
-    @RequestMapping("/{id}/version/{version}")
+    @PutMapping("/{id}/version/{version}")
     protected ResponseEntity<MenuItemDtoOutput> put(@PathVariable long id, @PathVariable("version") int version,
                                                     @RequestBody MenuItemDtoInput dtoInput) {
         try {
@@ -106,8 +102,7 @@ public class ApiMenuItemController {
     //DELETE POSITION
     //need param id
     //param delete - true completely delete/false delete menu_id
-    @DeleteMapping
-    @RequestMapping("/{id}/delete/{delete}")
+    @DeleteMapping("/{id}/delete/{delete}")
     protected ResponseEntity<Object> delete(@PathVariable long id, @PathVariable("delete") boolean delete) {
         try {
             menuItemService.delete(String.valueOf(id), String.valueOf(delete));
