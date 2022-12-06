@@ -1,4 +1,4 @@
-package groupId.artifactId.controller.servlet.api;
+package groupId.artifactId.controller.rest.api;
 
 import groupId.artifactId.controller.validator.MenuItemValidator;
 import groupId.artifactId.controller.validator.api.IMenuItemValidator;
@@ -20,12 +20,12 @@ import java.util.List;
 //IMenuItem
 @RestController
 @RequestMapping("/api/menu_item")
-public class ApiMenuItemServlet {
+public class ApiMenuItemController {
     private final IMenuItemService menuItemService;
     private final IMenuItemValidator menuItemValidator;
     private final Logger logger;
 
-    public ApiMenuItemServlet(MenuItemService menuItemService, MenuItemValidator menuItemValidator) {
+    public ApiMenuItemController(MenuItemService menuItemService, MenuItemValidator menuItemValidator) {
         this.menuItemService = menuItemService;
         this.menuItemValidator = menuItemValidator;
         this.logger = LoggerFactory.getLogger(this.getClass());
