@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/order")
-public class ApiOrderController extends HttpServlet {
+public class ApiOrderController {
     private final IOrderService orderService;
     private final IOrderValidator orderValidator;
     private final Logger logger;
