@@ -1,6 +1,6 @@
 package groupId.artifactId.controller.rest.api;
 
-import groupId.artifactId.controller.validator.api.IMenuItemValidator;
+import groupId.artifactId.controller.validator.api.IPizzaInfoValidator;
 import groupId.artifactId.core.dto.input.MenuItemDtoInput;
 import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.exceptions.NoContentException;
@@ -10,24 +10,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.OptimisticLockException;
+import javax.validation.Valid;
+import javax.validation.ValidationException;
 import java.util.List;
 
 //CRUD controller
 //IMenuItem
 @RestController
+@Validated
 @RequestMapping("/api/menu_item")
 public class ApiMenuItemController {
     private final IMenuItemService menuItemService;
-    private final IMenuItemValidator menuItemValidator;
+    private final IPizzaInfoValidator pizzaInfoValidator;
     private final Logger logger;
 
     @Autowired
-    public ApiMenuItemController(IMenuItemService menuItemService, IMenuItemValidator menuItemValidator) {
+    public ApiMenuItemController(IMenuItemService menuItemService, IPizzaInfoValidator pizzaInfoValidator) {
         this.menuItemService = menuItemService;
-        this.menuItemValidator = menuItemValidator;
+        this.pizzaInfoValidator = pizzaInfoValidator;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -64,11 +68,11 @@ public class ApiMenuItemController {
     //CREATE POSITION
     //body json
     @PostMapping
-    protected ResponseEntity<MenuItemDtoOutput> post(@RequestBody MenuItemDtoInput dtoInput) {
+    protected ResponseEntity<MenuItemDtoOutput> post(@RequestBody @Valid MenuItemDtoInput dtoInput) {
         try {
-            menuItemValidator.validate(dtoInput); // TODO
+            pizzaInfoValidator.validate(dtoInput.getPizzaInfoDtoInput());
             return ResponseEntity.ok(this.menuItemService.save(dtoInput));
-        } catch (NoContentException e) {
+        } catch (NoContentException | ValidationException e) {
             logger.error("/api/menu_item there is no content to fulfill doPost method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
@@ -83,11 +87,11 @@ public class ApiMenuItemController {
     //body json
     @PutMapping("/{id}/version/{version}")
     protected ResponseEntity<MenuItemDtoOutput> put(@PathVariable long id, @PathVariable("version") int version,
-                                                    @RequestBody MenuItemDtoInput dtoInput) {
+                                                    @Valid @RequestBody MenuItemDtoInput dtoInput) {
         try {
-            menuItemValidator.validate(dtoInput); // TODO
+            pizzaInfoValidator.validate(dtoInput.getPizzaInfoDtoInput());
             return ResponseEntity.ok(this.menuItemService.update(dtoInput, String.valueOf(id), String.valueOf(version)));
-        } catch (NoContentException e) {
+        } catch (NoContentException | ValidationException e) {
             logger.error("/api/menu_item there is no content to fulfill doPut method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (OptimisticLockException e) {
