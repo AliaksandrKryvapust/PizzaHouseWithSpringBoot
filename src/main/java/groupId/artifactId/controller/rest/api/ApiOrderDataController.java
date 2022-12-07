@@ -1,6 +1,5 @@
 package groupId.artifactId.controller.rest.api;
 
-import groupId.artifactId.controller.validator.api.IOrderDataValidator;
 import groupId.artifactId.core.dto.input.OrderDataDtoInput;
 import groupId.artifactId.core.dto.output.OrderDataDtoOutput;
 import groupId.artifactId.core.dto.output.crud.OrderDataDtoCrudOutput;
@@ -13,23 +12,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/api/order_data")
 public class ApiOrderDataController {
     private final IOrderDataService orderDataService;
     private final IOrderService orderService;
-    private final IOrderDataValidator orderDataValidator;
     private final Logger logger;
 
     @Autowired
-    public ApiOrderDataController(IOrderDataService orderDataService, IOrderDataValidator orderDataValidator,
-                                  IOrderService orderService) {
+    public ApiOrderDataController(IOrderDataService orderDataService, IOrderService orderService) {
         this.orderDataService = orderDataService;
-        this.orderDataValidator = orderDataValidator;
         this.orderService = orderService;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
@@ -67,9 +66,8 @@ public class ApiOrderDataController {
     //CREATE POSITION
     //body json
     @PostMapping
-    protected ResponseEntity<OrderDataDtoCrudOutput> post(@RequestBody OrderDataDtoInput orderDataDtoInput) {
+    protected ResponseEntity<OrderDataDtoCrudOutput> post(@Valid @RequestBody OrderDataDtoInput orderDataDtoInput) {
         try {
-            orderDataValidator.validate(orderDataDtoInput); //TODO
             ITicket ticket = this.orderService.getRow(orderDataDtoInput.getTicketId());
             OrderDataDtoInput orderData = OrderDataDtoInput.builder().ticketId(orderDataDtoInput.getTicketId())
                     .description(orderDataDtoInput.getDescription()).ticket(ticket).build();
