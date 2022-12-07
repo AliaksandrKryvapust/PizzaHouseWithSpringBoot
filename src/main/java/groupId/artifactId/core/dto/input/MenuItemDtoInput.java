@@ -1,17 +1,20 @@
 package groupId.artifactId.core.dto.input;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 @Builder
-@Getter
-@ToString
+@Data
 @Jacksonized
 public class MenuItemDtoInput {
-    private final @NonNull Double price;
-    private final @NonNull PizzaInfoDtoInput pizzaInfoDtoInput;
+    @NotNull(message = "price cannot be null")
+    @Positive(message = "price should not be less than 0")
+    private final Double price;
+    @NotNull(message = "pizza info cannot be null")
+    private final PizzaInfoDtoInput pizzaInfoDtoInput;
     private final Long menuId;
 }
