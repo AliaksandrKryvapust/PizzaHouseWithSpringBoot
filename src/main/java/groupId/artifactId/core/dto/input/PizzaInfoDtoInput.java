@@ -1,17 +1,21 @@
 package groupId.artifactId.core.dto.input;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 @Builder
-@Getter
-@ToString
+@Data
 @Jacksonized
 public class PizzaInfoDtoInput {
-    private final @NonNull String name;
-    private final @NonNull String description;
-    private final @NonNull Integer size;
+    @NotBlank(message = "name cannot be empty")
+    private final String name;
+    @NotBlank(message = "description cannot be empty")
+    private final String description;
+    @NotNull(message = "size cannot be null")
+    @Positive(message = "size should not be less than 0")
+    private final Integer size;
 }

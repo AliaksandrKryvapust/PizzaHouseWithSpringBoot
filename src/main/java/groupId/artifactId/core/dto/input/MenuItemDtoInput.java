@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -14,6 +15,7 @@ public class MenuItemDtoInput {
     @NotNull(message = "price cannot be null")
     @Positive(message = "price should not be less than 0")
     private final Double price;
+    @Valid
     @NotNull(message = "pizza info cannot be null")
     private final PizzaInfoDtoInput pizzaInfoDtoInput;
     private final Long menuId;
