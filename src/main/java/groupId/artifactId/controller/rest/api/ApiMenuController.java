@@ -1,6 +1,5 @@
 package groupId.artifactId.controller.rest.api;
 
-import groupId.artifactId.controller.validator.api.IMenuValidator;
 import groupId.artifactId.core.dto.input.MenuDtoInput;
 import groupId.artifactId.core.dto.output.MenuDtoOutput;
 import groupId.artifactId.core.dto.output.crud.MenuDtoCrudOutput;
@@ -11,24 +10,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.OptimisticLockException;
+import javax.validation.Valid;
 import java.util.List;
 
 //CRUD controller
 //IMenu
 @RestController
+@Validated
 @RequestMapping("/api/menu")
 public class ApiMenuController {
     private final IMenuService menuService;
-    private final IMenuValidator menuValidator;
     private final Logger logger;
 
     @Autowired
-    public ApiMenuController(IMenuService menuService, IMenuValidator menuValidator) {
+    public ApiMenuController(IMenuService menuService) {
         this.menuService = menuService;
-        this.menuValidator = menuValidator;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -65,9 +65,8 @@ public class ApiMenuController {
     //CREATE POSITION
     //body json
     @PostMapping
-    protected ResponseEntity<MenuDtoCrudOutput> post(@RequestBody MenuDtoInput menuDtoInput) {
+    protected ResponseEntity<MenuDtoCrudOutput> post(@Valid @RequestBody MenuDtoInput menuDtoInput) {
         try {
-            menuValidator.validate(menuDtoInput); //TODO
             return ResponseEntity.ok(menuService.save(menuDtoInput));
         } catch (NoContentException e) {
             logger.error("/api/menu there is no content to fulfill doPost method " + e.getMessage() + "\t" + e.getCause());
@@ -84,9 +83,8 @@ public class ApiMenuController {
     //body json
     @PutMapping("/{id}/version/{version}")
     protected ResponseEntity<MenuDtoCrudOutput> put(@PathVariable long id, @PathVariable("version") int version,
-                                                    @RequestBody MenuDtoInput menuDtoInput) {
+                                                    @Valid @RequestBody MenuDtoInput menuDtoInput) {
         try {
-            menuValidator.validate(menuDtoInput); //TODO
             return ResponseEntity.ok(menuService.update(menuDtoInput, String.valueOf(id), String.valueOf(version)));
         } catch (NoContentException e) {
             logger.error("/api/menu there is no content to fulfill doPut method " + e.getMessage() + "\t" + e.getCause());
