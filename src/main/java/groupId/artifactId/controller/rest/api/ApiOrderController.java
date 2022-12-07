@@ -1,6 +1,5 @@
 package groupId.artifactId.controller.rest.api;
 
-import groupId.artifactId.controller.validator.api.IOrderValidator;
 import groupId.artifactId.core.dto.input.OrderDtoInput;
 import groupId.artifactId.core.dto.output.TicketDtoOutput;
 import groupId.artifactId.core.dto.output.crud.TicketDtoCrudOutput;
@@ -11,22 +10,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServlet;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/api/order")
 public class ApiOrderController {
     private final IOrderService orderService;
-    private final IOrderValidator orderValidator;
     private final Logger logger;
 
     @Autowired
-    public ApiOrderController(IOrderService orderService, IOrderValidator orderValidator) {
+    public ApiOrderController(IOrderService orderService) {
         this.orderService = orderService;
-        this.orderValidator = orderValidator;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -63,9 +62,8 @@ public class ApiOrderController {
     //CREATE POSITION
     //body json
     @PostMapping
-    protected ResponseEntity<TicketDtoCrudOutput> post(@RequestBody OrderDtoInput orderDtoInput) {
+    protected ResponseEntity<TicketDtoCrudOutput> post(@Valid @RequestBody OrderDtoInput orderDtoInput) {
         try {
-            orderValidator.validate(orderDtoInput);//TODO
             return ResponseEntity.ok(orderService.save(orderDtoInput));
         } catch (NoContentException e) {
             logger.error("/api/order there is no content to fulfill doPost method " + e.getMessage() + "\t" + e.getCause());
