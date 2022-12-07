@@ -3,9 +3,6 @@ package groupId.artifactId.core;
 public class Constants {
     public static final String CONTENT_TYPE = "application/json; charset=UTF-8";
     public static final String ENCODING = "UTF-8";
-    public static final String PARAMETER_ID = "id";
-    public static final String PARAMETER_VERSION = "version";
-    public static final String PARAMETER_DELETE = "delete";
     public static final String MENU_ITEM_FK = "menu_item_menu_FK";
     public static final String MENU_ITEM_FK2 = "menu_item_pizza_info_FK";
     public static final String MENU_ITEM_UK = "pizza_info_id_menu_id_UK";
