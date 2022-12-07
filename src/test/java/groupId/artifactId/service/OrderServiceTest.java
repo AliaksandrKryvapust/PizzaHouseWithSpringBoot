@@ -118,13 +118,14 @@ class OrderServiceTest {
         final int version = 1;
         final Instant creationDate = Instant.now();
         final List<Long> ids = singletonList(id);
-        final OrderDtoInput orderDtoInput = OrderDtoInput.builder().selectedItems(singletonList(SelectedItemDtoInput.builder()
-                .menuItemId(id).count(count).build())).build();
+        final List<SelectedItemDtoInput> selectedItemDtoInput = singletonList(SelectedItemDtoInput.builder()
+                .menuItemId(id).count(count).build());
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(pizzaDescription).size(size).build();
         final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build();
         List<ISelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).count(count).menuItem(menuItem)
                 .createAt(creationDate).build());
+        final OrderDtoInput orderDtoInput = OrderDtoInput.builder().selectedItems(selectedItemDtoInput).build();
         final Order order = new Order(id, selectedItems);
         final ITicket ticket = new Ticket(id, order, creationDate);
         final TicketDtoCrudOutput crudOutput = TicketDtoCrudOutput.builder().id(id).orderId(id).createAt(creationDate)
