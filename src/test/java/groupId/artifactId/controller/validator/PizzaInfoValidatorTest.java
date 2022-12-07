@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.validation.ValidationException;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,7 +27,7 @@ class PizzaInfoValidatorTest {
                 .size(size).build();
 
         //test
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> pizzaInfoValidator.validate(pizzaInfoDtoInput));
+        Exception exception = assertThrows(ValidationException.class, () -> pizzaInfoValidator.validate(pizzaInfoDtoInput));
 
         // assert
         Assertions.assertEquals(messageExpected, exception.getMessage());
@@ -42,7 +44,7 @@ class PizzaInfoValidatorTest {
                 .size(size).build();
 
         //test
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> pizzaInfoValidator.validate(pizzaInfoDtoInput));
+        Exception exception = assertThrows(ValidationException.class, () -> pizzaInfoValidator.validate(pizzaInfoDtoInput));
 
         // assert
         Assertions.assertEquals(messageExpected, exception.getMessage());
@@ -58,7 +60,7 @@ class PizzaInfoValidatorTest {
                 .size(0).build();
 
         //test
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> pizzaInfoValidator.validate(pizzaInfoDtoInput));
+        Exception exception = assertThrows(ValidationException.class, () -> pizzaInfoValidator.validate(pizzaInfoDtoInput));
 
         // assert
         Assertions.assertEquals(messageExpected, exception.getMessage());
