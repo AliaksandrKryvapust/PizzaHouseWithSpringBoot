@@ -1,6 +1,5 @@
 package groupId.artifactId.controller.rest.api;
 
-import groupId.artifactId.controller.validator.api.IPizzaInfoValidator;
 import groupId.artifactId.core.dto.input.MenuItemDtoInput;
 import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.exceptions.NoContentException;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.OptimisticLockException;
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import java.util.List;
 
 //CRUD controller
@@ -25,13 +23,11 @@ import java.util.List;
 @RequestMapping("/api/menu_item")
 public class ApiMenuItemController {
     private final IMenuItemService menuItemService;
-    private final IPizzaInfoValidator pizzaInfoValidator;
     private final Logger logger;
 
     @Autowired
-    public ApiMenuItemController(IMenuItemService menuItemService, IPizzaInfoValidator pizzaInfoValidator) {
+    public ApiMenuItemController(IMenuItemService menuItemService) {
         this.menuItemService = menuItemService;
-        this.pizzaInfoValidator = pizzaInfoValidator;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -70,9 +66,8 @@ public class ApiMenuItemController {
     @PostMapping
     protected ResponseEntity<MenuItemDtoOutput> post(@RequestBody @Valid MenuItemDtoInput dtoInput) {
         try {
-            pizzaInfoValidator.validate(dtoInput.getPizzaInfoDtoInput());
             return ResponseEntity.ok(this.menuItemService.save(dtoInput));
-        } catch (NoContentException | ValidationException e) {
+        } catch (NoContentException e) {
             logger.error("/api/menu_item there is no content to fulfill doPost method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
@@ -89,9 +84,8 @@ public class ApiMenuItemController {
     protected ResponseEntity<MenuItemDtoOutput> put(@PathVariable long id, @PathVariable("version") int version,
                                                     @Valid @RequestBody MenuItemDtoInput dtoInput) {
         try {
-            pizzaInfoValidator.validate(dtoInput.getPizzaInfoDtoInput());
             return ResponseEntity.ok(this.menuItemService.update(dtoInput, String.valueOf(id), String.valueOf(version)));
-        } catch (NoContentException | ValidationException e) {
+        } catch (NoContentException e) {
             logger.error("/api/menu_item there is no content to fulfill doPut method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (OptimisticLockException e) {
