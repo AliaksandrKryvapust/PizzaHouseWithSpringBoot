@@ -29,12 +29,12 @@ public class MenuItemDao implements IMenuItemDao {
     }
 
     @Override
-    public IMenuItem save(IMenuItem menuItem, EntityManager entityTransaction) {
+    public IMenuItem save(IMenuItem menuItem) {
         if (menuItem.getId() != null || menuItem.getVersion() != null) {
             throw new IllegalStateException("MenuItem id & version should be empty");
         }
         try {
-            entityTransaction.persist(menuItem);
+            entityManager.persist(menuItem);
             return menuItem;
         } catch (PersistenceException e) {
             if (e.getMessage().contains(MENU_ITEM_UK) || e.getMessage().contains(MENU_ITEM_FK)
@@ -50,12 +50,12 @@ public class MenuItemDao implements IMenuItemDao {
     }
 
     @Override
-    public IMenuItem update(IMenuItem menuItem, Long id, Integer version, EntityManager entityTransaction) {
+    public IMenuItem update(IMenuItem menuItem, Long id, Integer version) {
         if (menuItem.getId() != null || menuItem.getVersion() != null) {
             throw new IllegalStateException("MenuItem id & version should be empty");
         }
         try {
-            MenuItem currentEntity = (MenuItem) this.getLock(id, entityTransaction);
+            MenuItem currentEntity = (MenuItem) this.get(id);
             if (!currentEntity.getVersion().equals(version)) {
                 throw new OptimisticLockException();
             }
@@ -65,7 +65,7 @@ public class MenuItemDao implements IMenuItemDao {
             currentPizzaInfo.setSize(menuItem.getPizzaInfo().getSize());
             currentEntity.setPrice(menuItem.getPrice());
             currentEntity.setPizzaInfo(currentPizzaInfo);
-            entityTransaction.merge(currentEntity);
+            entityManager.merge(currentEntity);
             return currentEntity;
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
@@ -100,11 +100,11 @@ public class MenuItemDao implements IMenuItemDao {
     }
 
     @Override
-    public void delete(Long id, Boolean delete, EntityManager entityTransaction) {
+    public void delete(Long id, Boolean delete) {
         try {
-            MenuItem menuItem = (MenuItem) this.getLock(id, entityTransaction);
-            if (delete){
-                entityTransaction.remove(menuItem);
+            MenuItem menuItem = (MenuItem) this.get(id);
+            if (delete) {
+                entityManager.remove(menuItem);
             }
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
@@ -130,24 +130,9 @@ public class MenuItemDao implements IMenuItemDao {
     }
 
     @Override
-    public IMenuItem getLock(Long id, EntityManager entityTransaction) {
+    public List<IMenuItem> getListById(List<Long> ids) {
         try {
-            MenuItem menuItem = entityTransaction.find(MenuItem.class, id);
-            if (menuItem == null) {
-                throw new NoContentException("There is no Menu Item with id:" + id);
-            }
-            return menuItem;
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new DaoException("Failed to get Lock of Menu Item from Data Base by id:" + id + "cause: " + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public List<IMenuItem> getAllLock(List<Long> ids, EntityManager entityTransaction) {
-        try {
-            List<?> iMenuItems = entityTransaction.createQuery(SELECT_MENU_ITEMS_BY_IDS)
+            List<?> iMenuItems = entityManager.createQuery(SELECT_MENU_ITEMS_BY_IDS)
                     .setParameter("ids", ids).getResultList();
             List<IMenuItem> output = iMenuItems.stream().filter((i) -> i instanceof IMenuItem)
                     .map(IMenuItem.class::cast).collect(Collectors.toList());
