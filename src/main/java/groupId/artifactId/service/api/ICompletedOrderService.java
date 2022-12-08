@@ -6,7 +6,6 @@ import groupId.artifactId.dao.entity.api.ICompletedOrder;
 
 import javax.persistence.EntityManager;
 
-public interface ICompletedOrderService extends IService<CompletedOrderDtoCrudOutput, ICompletedOrder> {
-    CompletedOrderDtoOutput getAllData(Long id);
-    CompletedOrderDtoCrudOutput create(ICompletedOrder type, EntityManager entityManager);
+public interface ICompletedOrderService extends IService<ICompletedOrder> {
+    ICompletedOrder create(ICompletedOrder type);
 }
