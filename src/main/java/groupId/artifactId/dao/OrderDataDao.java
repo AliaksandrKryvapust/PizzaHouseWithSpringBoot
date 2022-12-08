@@ -26,12 +26,12 @@ public class OrderDataDao implements IOrderDataDao {
     }
 
     @Override
-    public IOrderData save(IOrderData orderData, EntityManager entityTransaction) {
+    public IOrderData save(IOrderData orderData) {
         if (orderData.getId() != null) {
             throw new IllegalStateException("Order data id should be empty");
         }
         try {
-            entityTransaction.persist(orderData);
+            entityManager.persist(orderData);
             return orderData;
         } catch (PersistenceException e) {
             if (e.getMessage().contains(ORDER_STAGE_UK) || e.getMessage().contains(ORDER_DATA_FK) ||
@@ -81,21 +81,9 @@ public class OrderDataDao implements IOrderDataDao {
     }
 
     @Override
-    public IOrderData getOptional(Long id, EntityManager entityTransaction) {
+    public IOrderData update(IOrderData orderData) {
         try {
-            List<?> iOrderData = entityTransaction.createQuery(SELECT_ORDER_DATA_BY_TICKET).setParameter(1, id)
-                    .getResultList();
-            return iOrderData.stream().filter((i) -> i instanceof IOrderData).map(IOrderData.class::cast)
-                    .findFirst().orElse(null);
-        } catch (Exception e) {
-            throw new DaoException("Failed to get Ticket from Data Base by id:" + id + "cause: " + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public IOrderData update(IOrderData orderData, EntityManager entityTransaction) {
-        try {
-            entityTransaction.persist(orderData);
+            entityManager.persist(orderData);
             return orderData;
         } catch (PersistenceException e) {
             if (e.getMessage().contains(ORDER_STAGE_UK) || e.getMessage().contains(ORDER_DATA_FK) ||

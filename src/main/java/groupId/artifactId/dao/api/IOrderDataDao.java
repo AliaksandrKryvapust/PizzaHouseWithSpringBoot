@@ -5,6 +5,5 @@ import groupId.artifactId.dao.entity.api.IOrderData;
 import javax.persistence.EntityManager;
 
 public interface IOrderDataDao extends IDao<IOrderData> {
-    IOrderData update(IOrderData orderData, EntityManager entityTransaction);
-    IOrderData getOptional(Long id, EntityManager entityManager);
+    IOrderData update(IOrderData orderData);
 }
