@@ -3,7 +3,7 @@ package groupId.artifactId.controller.rest.api;
 import groupId.artifactId.core.dto.input.MenuItemDtoInput;
 import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.exceptions.NoContentException;
-import groupId.artifactId.service.api.IMenuItemService;
+import groupId.artifactId.manager.api.IMenuItemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +22,12 @@ import java.util.List;
 @Validated
 @RequestMapping("/api/menu_item")
 public class ApiMenuItemController {
-    private final IMenuItemService menuItemService;
+    private final IMenuItemManager menuItemManager;
     private final Logger logger;
 
     @Autowired
-    public ApiMenuItemController(IMenuItemService menuItemService) {
-        this.menuItemService = menuItemService;
+    public ApiMenuItemController(IMenuItemManager menuItemManager) {
+        this.menuItemManager = menuItemManager;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -36,7 +36,7 @@ public class ApiMenuItemController {
     @GetMapping("/{id}")
     protected ResponseEntity<MenuItemDtoOutput> get(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(menuItemService.get(id));
+            return ResponseEntity.ok(menuItemManager.get(id));
         } catch (NoContentException e) {
             logger.error("/api/menu_item there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -51,7 +51,7 @@ public class ApiMenuItemController {
     @GetMapping
     protected ResponseEntity<List<MenuItemDtoOutput>> getList() {
         try {
-            return ResponseEntity.ok(menuItemService.get());
+            return ResponseEntity.ok(menuItemManager.get());
         } catch (NoContentException e) {
             logger.error("/api/menu_item there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -66,7 +66,7 @@ public class ApiMenuItemController {
     @PostMapping
     protected ResponseEntity<MenuItemDtoOutput> post(@RequestBody @Valid MenuItemDtoInput dtoInput) {
         try {
-            return ResponseEntity.ok(this.menuItemService.save(dtoInput));
+            return ResponseEntity.ok(this.menuItemManager.save(dtoInput));
         } catch (NoContentException e) {
             logger.error("/api/menu_item there is no content to fulfill doPost method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -84,7 +84,7 @@ public class ApiMenuItemController {
     protected ResponseEntity<MenuItemDtoOutput> put(@PathVariable long id, @PathVariable("version") int version,
                                                     @Valid @RequestBody MenuItemDtoInput dtoInput) {
         try {
-            return ResponseEntity.ok(this.menuItemService.update(dtoInput, String.valueOf(id), String.valueOf(version)));
+            return ResponseEntity.ok(this.menuItemManager.update(dtoInput, id, version));
         } catch (NoContentException e) {
             logger.error("/api/menu_item there is no content to fulfill doPut method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -103,7 +103,7 @@ public class ApiMenuItemController {
     @DeleteMapping("/{id}/delete/{delete}")
     protected ResponseEntity<Object> delete(@PathVariable long id, @PathVariable("delete") boolean delete) {
         try {
-            menuItemService.delete(String.valueOf(id), String.valueOf(delete));
+            menuItemManager.delete(id, delete);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NoContentException e) {
             logger.error("/api/menu_item there is no content to fulfill doDelete method " + e.getMessage() + "\t" + e.getCause());
