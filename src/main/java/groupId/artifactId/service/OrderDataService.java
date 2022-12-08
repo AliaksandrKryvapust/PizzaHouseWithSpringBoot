@@ -1,27 +1,21 @@
 package groupId.artifactId.service;
 
 import groupId.artifactId.core.dto.input.OrderDataDtoInput;
-import groupId.artifactId.core.dto.output.OrderDataDtoOutput;
-import groupId.artifactId.core.dto.output.crud.OrderDataDtoCrudOutput;
 import groupId.artifactId.core.mapper.CompletedOrderMapper;
-import groupId.artifactId.core.mapper.OrderDataMapper;
 import groupId.artifactId.core.mapper.OrderStageMapper;
 import groupId.artifactId.dao.api.IOrderDataDao;
 import groupId.artifactId.dao.entity.OrderData;
 import groupId.artifactId.dao.entity.api.IOrderData;
 import groupId.artifactId.dao.entity.api.IOrderStage;
 import groupId.artifactId.exceptions.DaoException;
-import groupId.artifactId.exceptions.NoContentException;
 import groupId.artifactId.exceptions.ServiceException;
 import groupId.artifactId.service.api.ICompletedOrderService;
 import groupId.artifactId.service.api.IOrderDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static groupId.artifactId.core.Constants.ORDER_FINISH_DESCRIPTION;
 import static java.util.Collections.singletonList;
@@ -29,102 +23,65 @@ import static java.util.Collections.singletonList;
 @Service
 public class OrderDataService implements IOrderDataService {
     private final IOrderDataDao orderDataDao;
-    private final OrderDataMapper orderDataMapper;
     private final OrderStageMapper orderStageMapper;
-    @PersistenceContext
-    private final EntityManager entityManager;
     private final ICompletedOrderService completedOrderService;
     private final CompletedOrderMapper completedOrderMapper;
 
     @Autowired
-    public OrderDataService(IOrderDataDao orderDataDao, OrderDataMapper orderDataMapper, OrderStageMapper orderStageMapper,
-                            EntityManager entityManager, ICompletedOrderService completedOrderService,
-                            CompletedOrderMapper completedOrderMapper) {
+    public OrderDataService(IOrderDataDao orderDataDao, OrderStageMapper orderStageMapper,
+                            ICompletedOrderService completedOrderService, CompletedOrderMapper completedOrderMapper) {
         this.orderDataDao = orderDataDao;
-        this.orderDataMapper = orderDataMapper;
         this.orderStageMapper = orderStageMapper;
-        this.entityManager = entityManager;
         this.completedOrderService = completedOrderService;
         this.completedOrderMapper = completedOrderMapper;
     }
 
     @Override
-    public OrderDataDtoOutput getAllData(Long id) {
-        try {
-            return orderDataMapper.outputMapping(this.orderDataDao.get(id));
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to getAll data from Order Data at Service by Ticket id" + id, e);
-        }
+    public void create(OrderDataDtoInput dtoInput) {
+        IOrderStage inputOrderStages = this.orderStageMapper.inputMapping(dtoInput.getDescription());
+        OrderData orderData = OrderData.builder().orderHistory(singletonList(inputOrderStages))
+                .ticket(dtoInput.getTicket()).build();
+        orderDataDao.save(orderData);
     }
 
     @Override
-    public void create(OrderDataDtoInput dtoInput, EntityManager entityTransaction) {
+    @Transactional
+    public IOrderData saveInTransaction(OrderDataDtoInput dtoInput) {
         try {
             IOrderStage inputOrderStages = this.orderStageMapper.inputMapping(dtoInput.getDescription());
-            OrderData orderData = OrderData.builder().orderHistory(singletonList(inputOrderStages))
-                    .ticket(dtoInput.getTicket()).build();
-            orderDataDao.save(orderData, entityTransaction);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to save Order Data" + dtoInput, e);
-        }
-    }
-
-    @Override
-    public OrderDataDtoCrudOutput save(OrderDataDtoInput dtoInput) {
-        try {
-            IOrderStage inputOrderStages = this.orderStageMapper.inputMapping(dtoInput.getDescription());
-            entityManager.getTransaction().begin();
-            OrderData orderData = (OrderData) this.orderDataDao.getOptional(dtoInput.getTicketId(), this.entityManager);
+            OrderData orderData = (OrderData) this.orderDataDao.get(dtoInput.getTicketId());
             orderData.getOrderHistory().add(inputOrderStages);
             orderData.setDone(inputOrderStages.getDescription().equals(ORDER_FINISH_DESCRIPTION));
-            IOrderData orderDataOutput = this.orderDataDao.update(orderData, this.entityManager);
+            IOrderData orderDataOutput = this.save(orderData);
             if (inputOrderStages.getDescription().equals(ORDER_FINISH_DESCRIPTION)) {
-                this.completedOrderService.create(completedOrderMapper.inputMapping(orderDataOutput), this.entityManager);
+                this.completedOrderService.create(completedOrderMapper.inputMapping(orderDataOutput));
             }
-            entityManager.getTransaction().commit();
-            return orderDataMapper.outputCrudMapping(orderDataOutput);
+            return orderDataOutput;
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to save Order Data" + dtoInput, e);
-        } finally {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-            }
         }
     }
 
     @Override
-    public List<OrderDataDtoCrudOutput> get() {
+    public IOrderData save(IOrderData orderData) {
+        return this.orderDataDao.update(orderData);
+    }
+
+    @Override
+    public List<IOrderData> get() {
         try {
-            return this.orderDataDao.get().stream().map(orderDataMapper::outputCrudMapping).collect(Collectors.toList());
+            return this.orderDataDao.get();
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
-        } catch (Exception e) {
-            throw new ServiceException("Failed to get Order Data at Service", e);
         }
     }
 
     @Override
-    public OrderDataDtoCrudOutput get(Long id) {
+    public IOrderData get(Long id) {
         try {
-            return orderDataMapper.outputCrudMapping(this.orderDataDao.get(id));
+            return this.orderDataDao.get(id);
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to get Order Data at Service by Ticket id" + id, e);
         }
     }
 }
