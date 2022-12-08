@@ -34,8 +34,6 @@ public class MenuItemManager implements IMenuItemManager {
             IMenuItem menuItem = this.menuItemService.saveInTransaction(menuItemMapper.inputMapping(menuItemDtoInput),
                     menuItemDtoInput.getMenuId());
             return menuItemMapper.outputMapping(menuItem);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
         } catch (Exception e) {
@@ -49,8 +47,6 @@ public class MenuItemManager implements IMenuItemManager {
         try {
             return this.menuItemService.get().stream().map(menuItemMapper::outputMapping)
                     .collect(Collectors.toList());
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
         } catch (Exception e) {
             throw new ServiceException("Failed to get List of Menu Item`s at Service\tcause" + e.getMessage(), e);
         }
@@ -60,8 +56,6 @@ public class MenuItemManager implements IMenuItemManager {
     public MenuItemDtoOutput get(Long id) {
         try {
             return menuItemMapper.outputMapping(this.menuItemService.get(id));
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
         } catch (Exception e) {
@@ -73,8 +67,6 @@ public class MenuItemManager implements IMenuItemManager {
     public void delete(Long id, Boolean delete) {
         try {
             this.menuItemService.delete(id, delete);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
         } catch (Exception e) {
@@ -88,8 +80,6 @@ public class MenuItemManager implements IMenuItemManager {
             IMenuItem menuItem = this.menuItemService.updateInTransaction(menuItemMapper.inputMapping(menuItemDtoInput),
                     menuItemDtoInput.getMenuId(), id, version);
             return menuItemMapper.outputMapping(menuItem);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
         } catch (OptimisticLockException e) {
             throw new OptimisticLockException(e.getMessage());
         } catch (NoContentException e) {
