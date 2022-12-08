@@ -3,7 +3,7 @@ package groupId.artifactId.controller.rest.api;
 import groupId.artifactId.core.dto.output.CompletedOrderDtoOutput;
 import groupId.artifactId.core.dto.output.crud.CompletedOrderDtoCrudOutput;
 import groupId.artifactId.exceptions.NoContentException;
-import groupId.artifactId.service.api.ICompletedOrderService;
+import groupId.artifactId.manager.api.ICompletedOrderManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +19,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/completed_order")
 public class ApiCompletedOrderController {
-    private final ICompletedOrderService completedOrderService;
+    private final ICompletedOrderManager completedOrderManager;
     private final Logger logger;
 
     @Autowired
-    public ApiCompletedOrderController(ICompletedOrderService completedOrderService) {
-        this.completedOrderService = completedOrderService;
+    public ApiCompletedOrderController(ICompletedOrderManager completedOrderManager) {
+        this.completedOrderManager = completedOrderManager;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -33,7 +33,7 @@ public class ApiCompletedOrderController {
     @GetMapping("/{id}")
     protected ResponseEntity<CompletedOrderDtoOutput> get(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(completedOrderService.getAllData(id));
+            return ResponseEntity.ok(completedOrderManager.getAllData(id));
         } catch (NoContentException e) {
             logger.error("/api/completed_order there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -48,7 +48,7 @@ public class ApiCompletedOrderController {
     @GetMapping
     protected ResponseEntity<List<CompletedOrderDtoCrudOutput>> getList() {
         try {
-            return ResponseEntity.ok(completedOrderService.get());
+            return ResponseEntity.ok(completedOrderManager.get());
         } catch (NoContentException e) {
             logger.error("/api/completed_order there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
