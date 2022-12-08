@@ -4,7 +4,7 @@ import groupId.artifactId.core.dto.input.OrderDtoInput;
 import groupId.artifactId.core.dto.output.TicketDtoOutput;
 import groupId.artifactId.core.dto.output.crud.TicketDtoCrudOutput;
 import groupId.artifactId.exceptions.NoContentException;
-import groupId.artifactId.service.api.IOrderService;
+import groupId.artifactId.manager.api.IOrderManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +20,12 @@ import java.util.List;
 @Validated
 @RequestMapping("/api/order")
 public class ApiOrderController {
-    private final IOrderService orderService;
+    private final IOrderManager orderManager;
     private final Logger logger;
 
     @Autowired
-    public ApiOrderController(IOrderService orderService) {
-        this.orderService = orderService;
+    public ApiOrderController(IOrderManager orderManager) {
+        this.orderManager = orderManager;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -34,7 +34,7 @@ public class ApiOrderController {
     @GetMapping("/{id}")
     protected ResponseEntity<TicketDtoOutput> get(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(orderService.getAllData(id));
+            return ResponseEntity.ok(orderManager.getAllData(id));
         } catch (NoContentException e) {
             logger.error("/api/order there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -49,7 +49,7 @@ public class ApiOrderController {
     @GetMapping
     protected ResponseEntity<List<TicketDtoCrudOutput>> getList() {
         try {
-            return ResponseEntity.ok(orderService.get());
+            return ResponseEntity.ok(orderManager.get());
         } catch (NoContentException e) {
             logger.error("/api/order there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -64,7 +64,7 @@ public class ApiOrderController {
     @PostMapping
     protected ResponseEntity<TicketDtoCrudOutput> post(@Valid @RequestBody OrderDtoInput orderDtoInput) {
         try {
-            return ResponseEntity.ok(orderService.save(orderDtoInput));
+            return ResponseEntity.ok(orderManager.save(orderDtoInput));
         } catch (NoContentException e) {
             logger.error("/api/order there is no content to fulfill doPost method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
