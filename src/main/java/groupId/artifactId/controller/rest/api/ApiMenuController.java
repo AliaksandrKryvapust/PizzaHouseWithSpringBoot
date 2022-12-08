@@ -4,7 +4,7 @@ import groupId.artifactId.core.dto.input.MenuDtoInput;
 import groupId.artifactId.core.dto.output.MenuDtoOutput;
 import groupId.artifactId.core.dto.output.crud.MenuDtoCrudOutput;
 import groupId.artifactId.exceptions.NoContentException;
-import groupId.artifactId.service.api.IMenuService;
+import groupId.artifactId.manager.api.IMenuManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +23,12 @@ import java.util.List;
 @Validated
 @RequestMapping("/api/menu")
 public class ApiMenuController {
-    private final IMenuService menuService;
+    private final IMenuManager menuManager;
     private final Logger logger;
 
     @Autowired
-    public ApiMenuController(IMenuService menuService) {
-        this.menuService = menuService;
+    public ApiMenuController(IMenuManager menuManager) {
+        this.menuManager = menuManager;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -37,7 +37,7 @@ public class ApiMenuController {
     @GetMapping("/{id}")
     protected ResponseEntity<MenuDtoOutput> get(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(menuService.getAllData(id));
+            return ResponseEntity.ok(menuManager.getAllData(id));
         } catch (NoContentException e) {
             logger.error("/api/menu there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -52,7 +52,7 @@ public class ApiMenuController {
     @GetMapping
     protected ResponseEntity<List<MenuDtoCrudOutput>> getList() {
         try {
-            return ResponseEntity.ok(menuService.get());
+            return ResponseEntity.ok(menuManager.get());
         } catch (NoContentException e) {
             logger.error("/api/menu there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -67,7 +67,7 @@ public class ApiMenuController {
     @PostMapping
     protected ResponseEntity<MenuDtoCrudOutput> post(@Valid @RequestBody MenuDtoInput menuDtoInput) {
         try {
-            return ResponseEntity.ok(menuService.save(menuDtoInput));
+            return ResponseEntity.ok(menuManager.save(menuDtoInput));
         } catch (NoContentException e) {
             logger.error("/api/menu there is no content to fulfill doPost method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -85,7 +85,7 @@ public class ApiMenuController {
     protected ResponseEntity<MenuDtoCrudOutput> put(@PathVariable long id, @PathVariable("version") int version,
                                                     @Valid @RequestBody MenuDtoInput menuDtoInput) {
         try {
-            return ResponseEntity.ok(menuService.update(menuDtoInput, String.valueOf(id), String.valueOf(version)));
+            return ResponseEntity.ok(menuManager.update(menuDtoInput, id, version));
         } catch (NoContentException e) {
             logger.error("/api/menu there is no content to fulfill doPut method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -104,7 +104,7 @@ public class ApiMenuController {
     @DeleteMapping("/{id}/delete/{delete}")
     protected ResponseEntity<Object> delete(@PathVariable long id, @PathVariable("delete") boolean delete) {
         try {
-            menuService.delete(String.valueOf(id), String.valueOf(delete));
+            menuManager.delete(id, delete);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NoContentException e) {
             logger.error("/api/menu there is no content to fulfill doDelete method " + e.getMessage() + "\t" + e.getCause());
