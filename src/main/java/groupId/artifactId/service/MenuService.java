@@ -1,172 +1,80 @@
 package groupId.artifactId.service;
 
-import groupId.artifactId.core.dto.input.MenuDtoInput;
-import groupId.artifactId.core.dto.output.MenuDtoOutput;
-import groupId.artifactId.core.dto.output.crud.MenuDtoCrudOutput;
-import groupId.artifactId.core.mapper.MenuMapper;
 import groupId.artifactId.dao.api.IMenuDao;
 import groupId.artifactId.dao.entity.api.IMenu;
 import groupId.artifactId.dao.entity.api.IMenuItem;
 import groupId.artifactId.exceptions.DaoException;
-import groupId.artifactId.exceptions.NoContentException;
 import groupId.artifactId.exceptions.ServiceException;
 import groupId.artifactId.service.api.IMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class MenuService implements IMenuService {
     private final IMenuDao dao;
-    private final MenuMapper menuMapper;
-    @PersistenceContext
-    private final EntityManager entityManager;
 
     @Autowired
-    public MenuService(IMenuDao dao, MenuMapper menuMapper, EntityManager entityManager) {
+    public MenuService(IMenuDao dao) {
         this.dao = dao;
-        this.menuMapper = menuMapper;
-        this.entityManager = entityManager;
     }
 
     @Override
-    public List<MenuDtoCrudOutput> get() {
+    public List<IMenu> get() {
         try {
-            List<MenuDtoCrudOutput> temp = new ArrayList<>();
-            for (IMenu menu : this.dao.get()) {
-                MenuDtoCrudOutput dtoCrudOutput = menuMapper.outputCrudMapping(menu);
-                temp.add(dtoCrudOutput);
-            }
-            return temp;
+            return this.dao.get();
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
-        } catch (Exception e) {
-            throw new ServiceException("Failed to get List of Menu`s at Service\tcause" + e.getMessage(), e);
-        }
-    }
-
-
-    @Override
-    public IMenu getRow(Long id, EntityManager entityTransaction) {
-        try {
-            return this.dao.getLock(id, entityTransaction);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        } catch (Exception e) {
-            throw new ServiceException("Failed to get List of Menu`s at Service\tcause" + e.getMessage(), e);
         }
     }
 
     @Override
-    public MenuDtoCrudOutput get(Long id) {
+    public IMenu get(Long id) {
         try {
-            IMenu menu = this.dao.get(id);
-            return menuMapper.outputCrudMapping(menu);
+            return this.dao.get(id);
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to get Menu at Service by id" + id + "\tcause" + e.getMessage(), e);
         }
     }
 
     @Override
-    public MenuDtoOutput getAllData(Long id) {
+    @Transactional
+    public IMenu update(IMenu menuInput, Long id, Integer version) {
         try {
-            IMenu menu = this.dao.get(id);
-            return menuMapper.outputMapping(menu);
+            return this.dao.update(menuInput, id, version);
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to get Menu at Service by id" + id + "\tcause" + e.getMessage(), e);
         }
     }
 
     @Override
-    public MenuDtoCrudOutput update(MenuDtoInput menuDtoInput, String id, String version) {
+    public IMenu updateItem(IMenu menu, IMenuItem menuItem) {
         try {
-            entityManager.getTransaction().begin();
-            IMenu menu = this.dao.update(menuMapper.inputMapping(menuDtoInput),
-                    Long.valueOf(id), Integer.valueOf(version), this.entityManager);
-            entityManager.getTransaction().commit();
-            return menuMapper.outputCrudMapping(menu);
+            return this.dao.updateItems(menu, menuItem);
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
-        } catch (javax.persistence.OptimisticLockException e) {
-            throw new OptimisticLockException(e.getMessage());
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to update Menu at Service " + menuDtoInput + "by id:" + id
-                    + "\tcause" + e.getMessage(), e);
-        } finally {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-            }
         }
     }
 
     @Override
-    public IMenu updateItem(IMenu menu, IMenuItem menuItem, EntityManager entityTransaction) {
+    @Transactional
+    public void delete(Long id, Boolean delete) {
         try {
-            return this.dao.updateItems(menu, menuItem, entityTransaction);
+            this.dao.delete(id, delete);
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
-        } catch (javax.persistence.OptimisticLockException e) {
-            throw new OptimisticLockException(e.getMessage());
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to update Menu at Service " + menu + "by menuItem:" + menuItem
-                    + "\tcause" + e.getMessage(), e);
         }
     }
 
     @Override
-    public void delete(String id, String delete) {
+    @Transactional
+    public IMenu save(IMenu menu) {
         try {
-            entityManager.getTransaction().begin();
-            this.dao.delete(Long.valueOf(id), Boolean.valueOf(delete), this.entityManager);
-            entityManager.getTransaction().commit();
+            return this.dao.save(menu);
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to delete Menu with id:" + id, e);
-        } finally {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-            }
-        }
-    }
-
-    @Override
-    public MenuDtoCrudOutput save(MenuDtoInput menuDtoInput) {
-        try {
-            entityManager.getTransaction().begin();
-            IMenu menu = this.dao.save(menuMapper.inputMapping(menuDtoInput), this.entityManager);
-            entityManager.getTransaction().commit();
-            return menuMapper.outputCrudMapping(menu);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to save Menu at Service" + menuDtoInput + "\tcause:"
-                    + e.getMessage(), e);
-        } finally {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-            }
         }
     }
 }

@@ -8,11 +8,7 @@ import groupId.artifactId.dao.entity.api.IMenuItem;
 
 import javax.persistence.EntityManager;
 
-public interface IMenuService extends IService<MenuDtoCrudOutput, MenuDtoInput>, IServiceUpdate<MenuDtoCrudOutput, MenuDtoInput>,
+public interface IMenuService extends IService<IMenu>, IServiceUpdate<IMenu>,
         IServiceDelete {
-    MenuDtoOutput getAllData(Long id);
-
-    IMenu getRow(Long id, EntityManager entityTransaction);
-
-    IMenu updateItem(IMenu menu, IMenuItem menuItem, EntityManager entityTransaction);
+    IMenu updateItem(IMenu menu, IMenuItem menuItem);
 }
