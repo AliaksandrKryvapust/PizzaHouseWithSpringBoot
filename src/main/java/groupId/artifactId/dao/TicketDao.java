@@ -26,12 +26,12 @@ public class TicketDao implements ITicketDao {
     }
 
     @Override
-    public ITicket save(ITicket ticket, EntityManager entityTransaction) {
+    public ITicket save(ITicket ticket) {
         if (ticket.getId() != null) {
             throw new IllegalStateException("Ticket id should be empty");
         }
         try {
-            entityTransaction.persist(ticket);
+            entityManager.persist(ticket);
             return ticket;
         } catch (PersistenceException e) {
             if (e.getMessage().contains(TICKET_UK) || e.getMessage().contains(SELECTED_ITEM_FK) ||
