@@ -27,12 +27,12 @@ public class CompletedOrderDao implements ICompletedOrderDao {
     }
 
     @Override
-    public ICompletedOrder save(ICompletedOrder completedOrder, EntityManager entityTransaction) {
+    public ICompletedOrder save(ICompletedOrder completedOrder) {
         if (completedOrder.getId() != null) {
             throw new IllegalStateException("Completed order id should be empty");
         }
         try {
-            entityTransaction.persist(completedOrder);
+            entityManager.persist(completedOrder);
             return completedOrder;
         } catch (PersistenceException e) {
             if (e.getMessage().contains(COMPLETED_ORDER_FK) || e.getMessage().contains(PIZZA_FK)) {
