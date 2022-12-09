@@ -4,6 +4,7 @@ import groupId.artifactId.dao.api.ICompletedOrderDao;
 import groupId.artifactId.dao.entity.api.ICompletedOrder;
 import groupId.artifactId.exceptions.DaoException;
 import groupId.artifactId.exceptions.NoContentException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -20,8 +21,9 @@ public class CompletedOrderDao implements ICompletedOrderDao {
     private static final String SELECT_COMPLETED_ORDER = "SELECT order from CompletedOrder order ORDER BY order.id";
     private static final String SELECT_COMPLETED_ORDER_BY_TICKET = "SELECT order from CompletedOrder order WHERE ticket.id=?1";
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
 
+    @Autowired
     public CompletedOrderDao(EntityManager entityManager) {
         this.entityManager = entityManager;
     }

@@ -5,6 +5,7 @@ import groupId.artifactId.dao.entity.Ticket;
 import groupId.artifactId.dao.entity.api.ITicket;
 import groupId.artifactId.exceptions.DaoException;
 import groupId.artifactId.exceptions.NoContentException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -19,8 +20,9 @@ import static groupId.artifactId.core.Constants.*;
 public class TicketDao implements ITicketDao {
     private static final String SELECT_TICKET = "SELECT ticket from Ticket ticket ORDER BY ticket.id";
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
 
+    @Autowired
     public TicketDao(EntityManager entityManager) {
         this.entityManager = entityManager;
     }

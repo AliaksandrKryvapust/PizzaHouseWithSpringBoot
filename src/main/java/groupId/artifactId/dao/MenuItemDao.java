@@ -6,6 +6,7 @@ import groupId.artifactId.dao.entity.PizzaInfo;
 import groupId.artifactId.dao.entity.api.IMenuItem;
 import groupId.artifactId.exceptions.DaoException;
 import groupId.artifactId.exceptions.NoContentException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -22,8 +23,9 @@ public class MenuItemDao implements IMenuItemDao {
     private static final String SELECT_MENU_ITEM = "SELECT menuItem from MenuItem menuItem ORDER BY id";
     private static final String SELECT_MENU_ITEMS_BY_IDS = "SELECT menuItem FROM MenuItem menuItem WHERE menuItem.id IN :ids";
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
 
+    @Autowired
     public MenuItemDao(EntityManager entityManager) {
         this.entityManager = entityManager;
     }

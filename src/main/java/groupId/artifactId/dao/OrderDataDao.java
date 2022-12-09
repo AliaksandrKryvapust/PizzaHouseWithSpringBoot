@@ -4,6 +4,7 @@ import groupId.artifactId.dao.api.IOrderDataDao;
 import groupId.artifactId.dao.entity.api.IOrderData;
 import groupId.artifactId.exceptions.DaoException;
 import groupId.artifactId.exceptions.NoContentException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -19,8 +20,9 @@ public class OrderDataDao implements IOrderDataDao {
     private static final String SELECT_ORDER_DATA = "SELECT data from OrderData data ORDER BY data.id";
     private static final String SELECT_ORDER_DATA_BY_TICKET = "SELECT data from OrderData data WHERE ticket.id=?1";
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
 
+    @Autowired
     public OrderDataDao(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
