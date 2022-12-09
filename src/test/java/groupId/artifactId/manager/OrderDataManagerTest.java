@@ -13,9 +13,11 @@ import groupId.artifactId.service.OrderDataService;
 import groupId.artifactId.service.OrderService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import static groupId.artifactId.core.Constants.ORDER_FINISH_DESCRIPTION;
 import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 
+@ExtendWith(MockitoExtension.class)
 class OrderDataManagerTest {
     @InjectMocks
     private OrderDataManager orderDataManager;

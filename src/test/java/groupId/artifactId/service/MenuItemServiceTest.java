@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.persistence.EntityManager;
 import java.time.Instant;
 import java.util.List;
 
@@ -48,7 +47,7 @@ class MenuItemServiceTest {
         Mockito.when(menuItemDao.save(any(IMenuItem.class))).thenReturn(menuItem);
 
         //test
-        IMenuItem test = menuItemService.saveInTransaction(menuItem, id);
+        IMenuItem test = menuItemService.saveInTransaction(menuItem, null);
 
         // assert
         Assertions.assertNotNull(test);
@@ -74,7 +73,7 @@ class MenuItemServiceTest {
         final int size = 32;
         final int version = 1;
         final Instant creationDate = Instant.now();
-        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
+        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
         final List<IMenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build());
         final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
@@ -110,8 +109,9 @@ class MenuItemServiceTest {
         final int size = 32;
         final int version = 1;
         final Instant creationDate = Instant.now();
+        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
         List<IMenuItem> menuItems = singletonList(MenuItem.builder().id(id).price(price)
-                .creationDate(creationDate).version(version).build());
+                .pizzaInfo(pizzaInfo).creationDate(creationDate).version(version).build());
         Mockito.when(menuItemDao.get()).thenReturn(menuItems);
 
         //test
@@ -178,11 +178,10 @@ class MenuItemServiceTest {
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
         final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
-        Mockito.when(menuItemDao.update(any(IMenuItem.class), any(Long.class), any(Integer.class),
-                any(EntityManager.class))).thenReturn(menuItem);
+        Mockito.when(menuItemDao.update(any(IMenuItem.class), any(Long.class), any(Integer.class))).thenReturn(menuItem);
 
         //test
-        IMenuItem test = menuItemService.updateInTransaction(menuItemInput, id, inputId, inputVersion);
+        IMenuItem test = menuItemService.updateInTransaction(menuItemInput, null, inputId, inputVersion);
 
         // assert
         Assertions.assertNotNull(test);
@@ -210,7 +209,7 @@ class MenuItemServiceTest {
         final Long inputId = 1L;
         final Integer inputVersion = 1;
         final Instant creationDate = Instant.now();
-        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
+        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
         final List<IMenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build());
         final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
@@ -218,8 +217,7 @@ class MenuItemServiceTest {
         final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
-        Mockito.when(menuItemDao.update(any(IMenuItem.class), any(Long.class), any(Integer.class),
-                any(EntityManager.class))).thenReturn(menuItem);
+        Mockito.when(menuItemDao.update(any(IMenuItem.class), any(Long.class), any(Integer.class))).thenReturn(menuItem);
         Mockito.when(menuService.get(any(Long.class))).thenReturn(menu);
         Mockito.when(menuService.updateItem(any(Menu.class), any(MenuItem.class))).thenReturn(menu);
 

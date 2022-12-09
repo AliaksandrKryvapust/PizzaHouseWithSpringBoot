@@ -11,9 +11,11 @@ import groupId.artifactId.dao.entity.api.ITicket;
 import groupId.artifactId.service.CompletedOrderService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 
+@ExtendWith(MockitoExtension.class)
 class CompletedOrderManagerTest {
     @InjectMocks
     private CompletedOrderManager completedOrderManager;

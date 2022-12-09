@@ -11,10 +11,12 @@ import groupId.artifactId.dao.entity.api.IMenuItem;
 import groupId.artifactId.service.MenuItemService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.List;
@@ -23,6 +25,7 @@ import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 
+@ExtendWith(MockitoExtension.class)
 class MenuItemManagerTest {
 
     @InjectMocks
@@ -47,7 +50,7 @@ class MenuItemManagerTest {
         final PizzaInfoDtoInput pizzaInfoDtoInput = PizzaInfoDtoInput.builder().name(pizzaName).description(description)
                 .size(size).build();
         final MenuItemDtoInput menuDtoInput = MenuItemDtoInput.builder().price(price)
-                .pizzaInfoDtoInput(pizzaInfoDtoInput).build();
+                .pizzaInfoDtoInput(pizzaInfoDtoInput).menuId(id).build();
         final MenuItem menuItemOutput = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
         final PizzaInfoDtoOutput pizzaInfoDtoOutput = PizzaInfoDtoOutput.builder().name(pizzaName).description(description)
@@ -176,7 +179,7 @@ class MenuItemManagerTest {
         final PizzaInfoDtoInput pizzaInfoDtoInput = PizzaInfoDtoInput.builder().name(pizzaName).description(description)
                 .size(size).build();
         final MenuItemDtoInput menuDtoInput = MenuItemDtoInput.builder().price(price)
-                .pizzaInfoDtoInput(pizzaInfoDtoInput).build();
+                .pizzaInfoDtoInput(pizzaInfoDtoInput).menuId(id).build();
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
         final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
