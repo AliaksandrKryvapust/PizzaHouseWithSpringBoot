@@ -19,7 +19,7 @@ public class Menu implements IMenu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany(targetEntity = MenuItem.class, fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = MenuItem.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "menu_id", referencedColumnName = "id")
     @Setter
     private List<IMenuItem> items;
