@@ -3,8 +3,10 @@ package groupId.artifactId.controller.filter.api;
 import groupId.artifactId.core.Constants;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
+@WebFilter
 public class ContentTypeAndEncodingFilter implements Filter {
 
     @Override
