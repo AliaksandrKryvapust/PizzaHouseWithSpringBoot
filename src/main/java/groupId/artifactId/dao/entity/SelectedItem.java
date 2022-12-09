@@ -18,7 +18,7 @@ public class SelectedItem implements ISelectedItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(targetEntity = MenuItem.class, fetch = FetchType.LAZY)
+    @OneToOne(targetEntity = MenuItem.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "menu_item_id", referencedColumnName = "id")
     @Setter
     private IMenuItem menuItem;

@@ -3,8 +3,6 @@ package groupId.artifactId.dao.entity;
 import groupId.artifactId.dao.entity.api.IOrder;
 import groupId.artifactId.dao.entity.api.ISelectedItem;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,7 +19,6 @@ public class Order implements IOrder {
     private Long id;
 
     @OneToMany(targetEntity = SelectedItem.class, cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SELECT)
     @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false)
     @Setter
     private List<ISelectedItem> selectedItems;
