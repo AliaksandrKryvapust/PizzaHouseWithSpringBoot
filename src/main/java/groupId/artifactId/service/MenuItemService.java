@@ -61,7 +61,7 @@ public class MenuItemService implements IMenuItemService {
         try {
             IMenuItem savedMenuItem = this.update(menuItem, id, version);
             if (menuId != null) {
-                IMenu menu = menuService.get(savedMenuItem.getId());
+                IMenu menu = menuService.get(menuId);
                 List<IMenuItem> items = menuService.updateItem(menu, savedMenuItem).getItems();
                 return Objects.requireNonNull(items.stream()
                         .filter((i) -> i.getPizzaInfo().getName().equals(savedMenuItem.getPizzaInfo().getName()))
