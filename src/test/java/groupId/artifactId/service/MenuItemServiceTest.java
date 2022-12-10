@@ -1,11 +1,10 @@
 package groupId.artifactId.service;
 
-import groupId.artifactId.dao.MenuItemDao;
+import groupId.artifactId.dao.api.IMenuItemDao;
 import groupId.artifactId.dao.entity.Menu;
 import groupId.artifactId.dao.entity.MenuItem;
 import groupId.artifactId.dao.entity.PizzaInfo;
 import groupId.artifactId.dao.entity.api.IMenu;
-import groupId.artifactId.dao.entity.api.IMenuItem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +27,7 @@ class MenuItemServiceTest {
     @InjectMocks
     private MenuItemService menuItemService;
     @Mock
-    private MenuItemDao menuItemDao;
+    private IMenuItemDao menuItemDao;
     @Mock
     private MenuService menuService;
 
@@ -44,10 +44,10 @@ class MenuItemServiceTest {
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
-        Mockito.when(menuItemDao.save(any(IMenuItem.class))).thenReturn(menuItem);
+        Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
 
         //test
-        IMenuItem test = menuItemService.saveInTransaction(menuItem, null);
+        MenuItem test = menuItemService.saveInTransaction(menuItem, null);
 
         // assert
         Assertions.assertNotNull(test);
@@ -74,18 +74,18 @@ class MenuItemServiceTest {
         final int version = 1;
         final Instant creationDate = Instant.now();
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
-        final List<IMenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
+        final List<MenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build());
         final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
                 .enable(enable).items(items).build();
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
-        Mockito.when(menuItemDao.save(any(IMenuItem.class))).thenReturn(menuItem);
+        Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
         Mockito.when(menuService.get(any(Long.class))).thenReturn(menu);
         Mockito.when(menuService.updateItem(any(Menu.class), any(MenuItem.class))).thenReturn(menu);
 
         //test
-        IMenuItem test = menuItemService.saveInTransaction(menuItem, id);
+        MenuItem test = menuItemService.saveInTransaction(menuItem, id);
 
         // assert
         Assertions.assertNotNull(test);
@@ -110,16 +110,16 @@ class MenuItemServiceTest {
         final int version = 1;
         final Instant creationDate = Instant.now();
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
-        List<IMenuItem> menuItems = singletonList(MenuItem.builder().id(id).price(price)
+        List<MenuItem> menuItems = singletonList(MenuItem.builder().id(id).price(price)
                 .pizzaInfo(pizzaInfo).creationDate(creationDate).version(version).build());
-        Mockito.when(menuItemDao.get()).thenReturn(menuItems);
+        Mockito.when(menuItemDao.findAll()).thenReturn(menuItems);
 
         //test
-        List<IMenuItem> test = menuItemService.get();
+        List<MenuItem> test = menuItemService.get();
 
         // assert
         Assertions.assertEquals(menuItems.size(), test.size());
-        for (IMenuItem output : test) {
+        for (MenuItem output : test) {
             Assertions.assertNotNull(output);
             Assertions.assertNotNull(output.getPizzaInfo());
             Assertions.assertEquals(id, output.getId());
@@ -143,12 +143,12 @@ class MenuItemServiceTest {
         final int version = 1;
         final Instant creationDate = Instant.now();
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
-        final IMenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
+        final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
-        Mockito.when(menuItemDao.get(id)).thenReturn(menuItem);
+        Mockito.when(menuItemDao.findById(id)).thenReturn(Optional.of(menuItem));
 
         //test
-        IMenuItem test = menuItemService.get(id);
+        MenuItem test = menuItemService.get(id);
 
         // assert
         Assertions.assertNotNull(test);
@@ -178,10 +178,11 @@ class MenuItemServiceTest {
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
         final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
-        Mockito.when(menuItemDao.update(any(IMenuItem.class), any(Long.class), any(Integer.class))).thenReturn(menuItem);
+        Mockito.when(menuItemDao.findById(id)).thenReturn(Optional.of(menuItem));
+        Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
 
         //test
-        IMenuItem test = menuItemService.updateInTransaction(menuItemInput, null, inputId, inputVersion);
+        MenuItem test = menuItemService.updateInTransaction(menuItemInput, null, inputId, inputVersion);
 
         // assert
         Assertions.assertNotNull(test);
@@ -210,19 +211,20 @@ class MenuItemServiceTest {
         final Integer inputVersion = 1;
         final Instant creationDate = Instant.now();
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
-        final List<IMenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
+        final List<MenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build());
         final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
                 .enable(enable).items(items).build();
         final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
-        Mockito.when(menuItemDao.update(any(IMenuItem.class), any(Long.class), any(Integer.class))).thenReturn(menuItem);
+        Mockito.when(menuItemDao.findById(id)).thenReturn(Optional.of(menuItem));
+        Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
         Mockito.when(menuService.get(any(Long.class))).thenReturn(menu);
         Mockito.when(menuService.updateItem(any(Menu.class), any(MenuItem.class))).thenReturn(menu);
 
         //test
-        IMenuItem test = menuItemService.updateInTransaction(menuItemInput, id, inputId, inputVersion);
+        MenuItem test = menuItemService.updateInTransaction(menuItemInput, id, inputId, inputVersion);
 
         // assert
         Assertions.assertNotNull(test);
@@ -240,17 +242,13 @@ class MenuItemServiceTest {
     void delete() {
         // preconditions
         final Long inputId = 1L;
-        final Boolean delete = false;
         ArgumentCaptor<Long> valueId = ArgumentCaptor.forClass(Long.class);
-        ArgumentCaptor<Boolean> valueDelete = ArgumentCaptor.forClass(Boolean.class);
 
         //test
-        menuItemService.delete(inputId, delete);
-        Mockito.verify(menuItemDao, times(1)).delete(valueId.capture(), valueDelete.capture());
+        menuItemService.delete(inputId);
+        Mockito.verify(menuItemDao, times(1)).deleteById(valueId.capture());
 
         // assert
         Assertions.assertEquals(inputId, valueId.getValue());
-        Assertions.assertEquals(delete, valueDelete.getValue());
     }
-
 }
