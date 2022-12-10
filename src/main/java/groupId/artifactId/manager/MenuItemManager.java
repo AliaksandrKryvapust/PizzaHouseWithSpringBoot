@@ -3,13 +3,13 @@ package groupId.artifactId.manager;
 import groupId.artifactId.core.dto.input.MenuItemDtoInput;
 import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.core.mapper.MenuItemMapper;
-import groupId.artifactId.dao.entity.api.IMenuItem;
-import groupId.artifactId.exceptions.DaoException;
+import groupId.artifactId.dao.entity.MenuItem;
 import groupId.artifactId.exceptions.NoContentException;
 import groupId.artifactId.exceptions.ServiceException;
 import groupId.artifactId.manager.api.IMenuItemManager;
 import groupId.artifactId.service.api.IMenuItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.OptimisticLockException;
@@ -31,9 +31,11 @@ public class MenuItemManager implements IMenuItemManager {
     @Override
     public MenuItemDtoOutput save(MenuItemDtoInput menuItemDtoInput) {
         try {
-            IMenuItem menuItem = this.menuItemService.saveInTransaction(menuItemMapper.inputMapping(menuItemDtoInput),
+            MenuItem menuItem = this.menuItemService.saveInTransaction(menuItemMapper.inputMapping(menuItemDtoInput),
                     menuItemDtoInput.getMenuId());
             return menuItemMapper.outputMapping(menuItem);
+        } catch (DataIntegrityViolationException e) {
+            throw new NoContentException("menu_item table insert failed,  check preconditions and FK values");
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
         } catch (Exception e) {
@@ -56,17 +58,16 @@ public class MenuItemManager implements IMenuItemManager {
     public MenuItemDtoOutput get(Long id) {
         try {
             return menuItemMapper.outputMapping(this.menuItemService.get(id));
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
+
         } catch (Exception e) {
             throw new ServiceException("Failed to get Menu Item at Service by id" + id + "\tcause" + e.getMessage(), e);
         }
     }
 
     @Override
-    public void delete(Long id, Boolean delete) {
+    public void delete(Long id) {
         try {
-            this.menuItemService.delete(id, delete);
+            this.menuItemService.delete(id);
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
         } catch (Exception e) {
@@ -77,9 +78,11 @@ public class MenuItemManager implements IMenuItemManager {
     @Override
     public MenuItemDtoOutput update(MenuItemDtoInput menuItemDtoInput, Long id, Integer version) {
         try {
-            IMenuItem menuItem = this.menuItemService.updateInTransaction(menuItemMapper.inputMapping(menuItemDtoInput),
+            MenuItem menuItem = this.menuItemService.updateInTransaction(menuItemMapper.inputMapping(menuItemDtoInput),
                     menuItemDtoInput.getMenuId(), id, version);
             return menuItemMapper.outputMapping(menuItem);
+        } catch (DataIntegrityViolationException e) {
+            throw new NoContentException("menu_item table update failed,  check preconditions and FK values");
         } catch (OptimisticLockException e) {
             throw new OptimisticLockException(e.getMessage());
         } catch (NoContentException e) {
