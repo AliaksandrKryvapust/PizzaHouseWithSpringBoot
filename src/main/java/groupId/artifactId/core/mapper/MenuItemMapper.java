@@ -5,8 +5,6 @@ import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.core.dto.output.PizzaInfoDtoOutput;
 import groupId.artifactId.dao.entity.MenuItem;
 import groupId.artifactId.dao.entity.PizzaInfo;
-import groupId.artifactId.dao.entity.api.IMenuItem;
-import groupId.artifactId.dao.entity.api.IPizzaInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -21,13 +19,13 @@ public class MenuItemMapper {
         this.pizzaInfoMapper = pizzaInfoMapper;
     }
 
-    public IMenuItem inputMapping(MenuItemDtoInput menuItemDtoInput) {
-        IPizzaInfo pizzaInfo = pizzaInfoMapper.inputMapping(menuItemDtoInput.getPizzaInfoDtoInput());
+    public MenuItem inputMapping(MenuItemDtoInput menuItemDtoInput) {
+        PizzaInfo pizzaInfo = pizzaInfoMapper.inputMapping(menuItemDtoInput.getPizzaInfoDtoInput());
         return MenuItem.builder().price(menuItemDtoInput.getPrice())
-                .pizzaInfo((PizzaInfo) pizzaInfo).build();
+                .pizzaInfo(pizzaInfo).build();
     }
 
-    public MenuItemDtoOutput outputMapping(IMenuItem menuItem) {
+    public MenuItemDtoOutput outputMapping(MenuItem menuItem) {
         PizzaInfoDtoOutput pizzaInfo = pizzaInfoMapper.outputMapping(menuItem.getPizzaInfo());
         return MenuItemDtoOutput.builder()
                 .id(menuItem.getId())

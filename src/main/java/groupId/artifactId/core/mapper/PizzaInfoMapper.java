@@ -3,7 +3,6 @@ package groupId.artifactId.core.mapper;
 import groupId.artifactId.core.dto.input.PizzaInfoDtoInput;
 import groupId.artifactId.core.dto.output.PizzaInfoDtoOutput;
 import groupId.artifactId.dao.entity.PizzaInfo;
-import groupId.artifactId.dao.entity.api.IPizzaInfo;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -14,14 +13,14 @@ public class PizzaInfoMapper {
     public PizzaInfoMapper() {
     }
 
-    public IPizzaInfo inputMapping(PizzaInfoDtoInput pizzaInfoDtoInput) {
+    public PizzaInfo inputMapping(PizzaInfoDtoInput pizzaInfoDtoInput) {
         return PizzaInfo.builder()
                 .name(pizzaInfoDtoInput.getName())
                 .description(pizzaInfoDtoInput.getDescription())
                 .size(pizzaInfoDtoInput.getSize()).build();
     }
 
-    public PizzaInfoDtoOutput outputMapping(IPizzaInfo pizzaInfo) {
+    public PizzaInfoDtoOutput outputMapping(PizzaInfo pizzaInfo) {
         return PizzaInfoDtoOutput.builder()
                 .name(pizzaInfo.getName())
                 .description(pizzaInfo.getDescription())
