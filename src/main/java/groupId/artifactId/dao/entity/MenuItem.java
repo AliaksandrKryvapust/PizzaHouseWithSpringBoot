@@ -26,15 +26,4 @@ public class MenuItem {
     private Instant creationDate;
     @Version
     private Integer version;
-
-    @Override
-    public String toString() {
-        return "MenuItem{" +
-                "id=" + id +
-                ", pizzaInfo=" + pizzaInfo +
-                ", price=" + price +
-                ", creationDate=" + creationDate +
-                ", version=" + version +
-                '}';
-    }
 }

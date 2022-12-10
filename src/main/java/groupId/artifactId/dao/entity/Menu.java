@@ -1,7 +1,5 @@
 package groupId.artifactId.dao.entity;
 
-import groupId.artifactId.dao.entity.api.IMenu;
-import groupId.artifactId.dao.entity.api.IMenuItem;
 import lombok.*;
 import org.hibernate.annotations.GenerationTime;
 
@@ -14,15 +12,16 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
+@NamedEntityGraph(name = "Menu.items", attributeNodes = @NamedAttributeNode("items"))
 @Table(name = "menu", schema = "pizza_manager")
-public class Menu implements IMenu {
+public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany(targetEntity = MenuItem.class, fetch = FetchType.EAGER)
+    @OneToMany
     @JoinColumn(name = "menu_id", referencedColumnName = "id")
     @Setter
-    private List<IMenuItem> items;
+    private List<MenuItem> items;
     @Setter
     private String name;
     @Setter
@@ -31,16 +30,4 @@ public class Menu implements IMenu {
     private Instant creationDate;
     @Version
     private Integer version;
-
-    @Override
-    public String toString() {
-        return "Menu{" +
-                "id=" + id +
-                ", items=" + items +
-                ", name='" + name + '\'' +
-                ", enable=" + enable +
-                ", creationDate=" + creationDate +
-                ", version=" + version +
-                '}';
-    }
 }
