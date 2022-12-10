@@ -3,7 +3,6 @@ package groupId.artifactId.core.mapper;
 import groupId.artifactId.core.dto.input.PizzaInfoDtoInput;
 import groupId.artifactId.core.dto.output.PizzaInfoDtoOutput;
 import groupId.artifactId.dao.entity.PizzaInfo;
-import groupId.artifactId.dao.entity.api.IPizzaInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +24,7 @@ class PizzaInfoMapperTest {
                 .size(size).build();
 
         //test
-        IPizzaInfo test = pizzaInfoMapper.inputMapping(pizzaInfoDtoInput);
+        PizzaInfo test = pizzaInfoMapper.inputMapping(pizzaInfoDtoInput);
 
         // assert
         Assertions.assertNotNull(test);
@@ -40,7 +39,7 @@ class PizzaInfoMapperTest {
         final String name = "ITALIANO PIZZA";
         final String description = "Mozzarella cheese, basilica, ham";
         final int size = 32;
-        final IPizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
+        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
 
         //test
         PizzaInfoDtoOutput test = pizzaInfoMapper.outputMapping(pizzaInfo);

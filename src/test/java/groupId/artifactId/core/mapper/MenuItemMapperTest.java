@@ -6,8 +6,6 @@ import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.core.dto.output.PizzaInfoDtoOutput;
 import groupId.artifactId.dao.entity.MenuItem;
 import groupId.artifactId.dao.entity.PizzaInfo;
-import groupId.artifactId.dao.entity.api.IMenuItem;
-import groupId.artifactId.dao.entity.api.IPizzaInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +41,7 @@ class MenuItemMapperTest {
 
 
         //test
-        IMenuItem test = menuItemMapper.inputMapping(menuDtoInput);
+        MenuItem test = menuItemMapper.inputMapping(menuDtoInput);
 
         // assert
         Assertions.assertNotNull(test);
@@ -68,7 +66,7 @@ class MenuItemMapperTest {
                 .creationDate(creationDate).version(version).build();
         final PizzaInfoDtoOutput pizzaInfoDtoOutput = PizzaInfoDtoOutput.builder().name(pizzaName).description(description)
                 .size(size).build();
-        Mockito.when(pizzaInfoMapper.outputMapping(any(IPizzaInfo.class))).thenReturn(pizzaInfoDtoOutput);
+        Mockito.when(pizzaInfoMapper.outputMapping(any(PizzaInfo.class))).thenReturn(pizzaInfoDtoOutput);
 
         //test
         MenuItemDtoOutput test = menuItemMapper.outputMapping(menuItem);
