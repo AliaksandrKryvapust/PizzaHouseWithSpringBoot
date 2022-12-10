@@ -1,14 +1,14 @@
 package groupId.artifactId.service;
 
 import groupId.artifactId.dao.api.IMenuItemDao;
+import groupId.artifactId.dao.entity.Menu;
 import groupId.artifactId.dao.entity.MenuItem;
 import groupId.artifactId.dao.entity.PizzaInfo;
-import groupId.artifactId.dao.entity.api.IMenu;
 import groupId.artifactId.exceptions.NoContentException;
 import groupId.artifactId.service.api.IMenuItemService;
 import groupId.artifactId.service.api.IMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.OptimisticLockException;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-@Component
+@Service
 public class MenuItemService implements IMenuItemService {
     private final IMenuItemDao menuItemDao;
     private final IMenuService menuService;
@@ -29,6 +29,9 @@ public class MenuItemService implements IMenuItemService {
 
     @Override
     public MenuItem save(MenuItem menuItem) {
+        if (menuItem.getId() != null || menuItem.getVersion() != null) {
+            throw new IllegalStateException("MenuItem id & version should be empty");
+        }
         return this.menuItemDao.save(menuItem);
     }
 
@@ -37,7 +40,7 @@ public class MenuItemService implements IMenuItemService {
     public MenuItem saveInTransaction(MenuItem menuItem, Long menuId) {
         MenuItem savedMenuItem = this.save(menuItem);
         if (menuId != null) {
-            IMenu menu = menuService.get(menuId);
+            Menu menu = menuService.get(menuId);
             List<MenuItem> items = menuService.updateItem(menu, savedMenuItem).getItems();
             return Objects.requireNonNull(items.stream()
                     .filter((i) -> i.getPizzaInfo().getName().equals(menuItem.getPizzaInfo().getName()))
@@ -71,7 +74,7 @@ public class MenuItemService implements IMenuItemService {
         try {
             MenuItem savedMenuItem = this.update(menuItem, id, version);
             if (menuId != null) {
-                IMenu menu = menuService.get(menuId);
+                Menu menu = menuService.get(menuId);
                 List<MenuItem> items = menuService.updateItem(menu, savedMenuItem).getItems();
                 return Objects.requireNonNull(items.stream()
                         .filter((i) -> i.getId().equals(id)).findFirst().orElseThrow());
@@ -92,7 +95,7 @@ public class MenuItemService implements IMenuItemService {
     public MenuItem get(Long id) {
         try {
             return this.menuItemDao.findById(id).orElseThrow();
-        } catch (NoContentException e) {
+        } catch (NoSuchElementException e) {
             throw new NoContentException(e.getMessage());
         }
     }

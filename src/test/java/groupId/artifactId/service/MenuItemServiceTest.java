@@ -4,7 +4,6 @@ import groupId.artifactId.dao.api.IMenuItemDao;
 import groupId.artifactId.dao.entity.Menu;
 import groupId.artifactId.dao.entity.MenuItem;
 import groupId.artifactId.dao.entity.PizzaInfo;
-import groupId.artifactId.dao.entity.api.IMenu;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,12 +41,13 @@ class MenuItemServiceTest {
         final int version = 1;
         final Instant creationDate = Instant.now();
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
+        final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
         Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
 
         //test
-        MenuItem test = menuItemService.saveInTransaction(menuItem, null);
+        MenuItem test = menuItemService.saveInTransaction(menuItemInput, null);
 
         // assert
         Assertions.assertNotNull(test);
@@ -76,8 +76,9 @@ class MenuItemServiceTest {
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
         final List<MenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build());
-        final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
+        final Menu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
                 .enable(enable).items(items).build();
+        final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
         Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
@@ -85,7 +86,7 @@ class MenuItemServiceTest {
         Mockito.when(menuService.updateItem(any(Menu.class), any(MenuItem.class))).thenReturn(menu);
 
         //test
-        MenuItem test = menuItemService.saveInTransaction(menuItem, id);
+        MenuItem test = menuItemService.saveInTransaction(menuItemInput, id);
 
         // assert
         Assertions.assertNotNull(test);
@@ -213,7 +214,7 @@ class MenuItemServiceTest {
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
         final List<MenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build());
-        final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
+        final Menu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
                 .enable(enable).items(items).build();
         final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
         final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)

@@ -1,10 +1,10 @@
 package groupId.artifactId.manager.api;
 
-import groupId.artifactId.dao.entity.api.*;
+import groupId.artifactId.dao.entity.*;
 
 public interface IPizzaHouse {
-    IMenu getMenu();
-    ITicket create(IOrder order);
-    IOrderData getOrderDataByToken(ITicket token);
-    ICompletedOrder getByToken(ITicket token);
+    Menu getMenu();
+    Ticket create(Order order);
+    OrderData getOrderDataByToken(Ticket token);
+    CompletedOrder getByToken(Ticket token);
 }
