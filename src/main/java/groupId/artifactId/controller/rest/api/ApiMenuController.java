@@ -100,11 +100,10 @@ public class ApiMenuController {
 
     //DELETE POSITION
     //need param id
-    //param delete - true/false completely delete
-    @DeleteMapping("/{id}/delete/{delete}")
-    protected ResponseEntity<Object> delete(@PathVariable long id, @PathVariable("delete") boolean delete) {
+    @DeleteMapping("/{id}")
+    protected ResponseEntity<Object> delete(@PathVariable long id) {
         try {
-            menuManager.delete(id, delete);
+            menuManager.delete(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NoContentException e) {
             logger.error("/api/menu there is no content to fulfill doDelete method " + e.getMessage() + "\t" + e.getCause());
