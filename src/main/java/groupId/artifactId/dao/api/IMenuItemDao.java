@@ -1,9 +1,9 @@
 package groupId.artifactId.dao.api;
 
-import groupId.artifactId.dao.entity.api.IMenuItem;
+import groupId.artifactId.dao.entity.MenuItem;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-public interface IMenuItemDao extends IDao<IMenuItem>, IDaoUpdate<IMenuItem>, IDaoDelete {
-    List<IMenuItem> getListById(List<Long> ids);
+@Repository
+public interface IMenuItemDao extends JpaRepository<MenuItem, Long> {
 }
