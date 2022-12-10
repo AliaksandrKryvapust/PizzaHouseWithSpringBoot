@@ -19,7 +19,7 @@ import java.util.Properties;
 @Configuration
 @ComponentScan(basePackages = "groupId.artifactId")
 @EnableTransactionManagement
-@EnableJpaRepositories
+@EnableJpaRepositories("groupId.artifactId")
 public class HibernateConfig {
     private final ApplicationContext context;
 
