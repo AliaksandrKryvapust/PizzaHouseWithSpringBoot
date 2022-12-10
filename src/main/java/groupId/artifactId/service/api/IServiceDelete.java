@@ -1,5 +1,5 @@
 package groupId.artifactId.service.api;
 
 public interface IServiceDelete {
-    void delete(Long id, Boolean delete);
+    void delete(Long id);
 }
