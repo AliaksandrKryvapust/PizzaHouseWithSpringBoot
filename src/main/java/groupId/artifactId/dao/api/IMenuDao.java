@@ -1,9 +1,16 @@
 package groupId.artifactId.dao.api;
 
-import groupId.artifactId.dao.entity.api.IMenu;
-import groupId.artifactId.dao.entity.api.IMenuItem;
+import groupId.artifactId.dao.entity.Menu;
+import lombok.NonNull;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface IMenuDao extends IDao<IMenu>, IDaoUpdate<IMenu>, IDaoDelete {
-    IMenu updateItems(IMenu menu, IMenuItem menuItem);
+import java.util.Optional;
+
+@Repository
+public interface IMenuDao extends JpaRepository<Menu, Long> {
+    @EntityGraph(value = "Menu.items")
+    @NonNull Optional<Menu> findById(@NonNull Long id);
 }
 
