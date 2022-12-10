@@ -9,8 +9,6 @@ import groupId.artifactId.core.mapper.MenuMapper;
 import groupId.artifactId.dao.entity.Menu;
 import groupId.artifactId.dao.entity.MenuItem;
 import groupId.artifactId.dao.entity.PizzaInfo;
-import groupId.artifactId.dao.entity.api.IMenu;
-import groupId.artifactId.dao.entity.api.IMenuItem;
 import groupId.artifactId.service.MenuService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,9 +48,9 @@ class MenuManagerTest {
         final int size = 32;
         final Instant creationDate = Instant.now();
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
-        final List<IMenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
+        final List<MenuItem> items = singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build());
-        final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
+        final Menu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
                 .enable(enable).items(items).build();
         final PizzaInfoDtoOutput pizzaInfoDtoOutput = PizzaInfoDtoOutput.builder().name(pizzaName).description(description)
                 .size(size).build();
@@ -61,7 +59,7 @@ class MenuManagerTest {
         final MenuDtoOutput dtoOutput = MenuDtoOutput.builder().id(id).createdAt(creationDate).version(version)
                 .name(name).enable(enable).items(singletonList(menuItemDtoOutput)).build();
         Mockito.when(menuService.get(id)).thenReturn(menu);
-        Mockito.when(menuMapper.outputMapping(any(IMenu.class))).thenReturn(dtoOutput);
+        Mockito.when(menuMapper.outputMapping(any(Menu.class))).thenReturn(dtoOutput);
 
         //test
         MenuDtoOutput test = menuManager.getAllData(id);
@@ -102,8 +100,8 @@ class MenuManagerTest {
         final MenuDtoCrudOutput crudOutput = MenuDtoCrudOutput.builder().id(id).createdAt(creationDate).version(version)
                 .name(name).enable(enable).build();
         Mockito.when(menuMapper.inputMapping(any(MenuDtoInput.class))).thenReturn(menu);
-        Mockito.when(menuService.save(any(IMenu.class))).thenReturn(menuOutput);
-        Mockito.when(menuMapper.outputCrudMapping(any(IMenu.class))).thenReturn(crudOutput);
+        Mockito.when(menuService.save(any(Menu.class))).thenReturn(menuOutput);
+        Mockito.when(menuMapper.outputCrudMapping(any(Menu.class))).thenReturn(crudOutput);
 
         //test
         MenuDtoCrudOutput test = menuManager.save(menuDtoInput);
@@ -125,12 +123,12 @@ class MenuManagerTest {
         final long id = 1L;
         final int version = 1;
         final Instant creationDate = Instant.now();
-        List<IMenu> menus = singletonList(Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
+        List<Menu> menus = singletonList(Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
                 .enable(enable).build());
         final MenuDtoCrudOutput crudOutput = MenuDtoCrudOutput.builder().id(id).createdAt(creationDate).version(version)
                 .name(name).enable(enable).build();
         Mockito.when(menuService.get()).thenReturn(menus);
-        Mockito.when(menuMapper.outputCrudMapping(any(IMenu.class))).thenReturn(crudOutput);
+        Mockito.when(menuMapper.outputCrudMapping(any(Menu.class))).thenReturn(crudOutput);
 
         //test
         List<MenuDtoCrudOutput> test = menuManager.get();
@@ -155,12 +153,12 @@ class MenuManagerTest {
         final long id = 1L;
         final int version = 1;
         final Instant creationDate = Instant.now();
-        final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
+        final Menu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
                 .enable(enable).build();
         final MenuDtoCrudOutput crudOutput = MenuDtoCrudOutput.builder().id(id).createdAt(creationDate).version(version)
                 .name(name).enable(enable).build();
         Mockito.when(menuService.get(id)).thenReturn(menu);
-        Mockito.when(menuMapper.outputCrudMapping(any(IMenu.class))).thenReturn(crudOutput);
+        Mockito.when(menuMapper.outputCrudMapping(any(Menu.class))).thenReturn(crudOutput);
 
         //test
         MenuDtoCrudOutput test = menuManager.get(id);
@@ -177,17 +175,14 @@ class MenuManagerTest {
     @Test
     void delete() {
         final Long inputId = 1L;
-        final Boolean delete = false;
         ArgumentCaptor<Long> valueId = ArgumentCaptor.forClass(Long.class);
-        ArgumentCaptor<Boolean> valueDelete = ArgumentCaptor.forClass(Boolean.class);
 
         //test
-        menuService.delete(inputId, delete);
-        Mockito.verify(menuService, times(1)).delete(valueId.capture(), valueDelete.capture());
+        menuService.delete(inputId);
+        Mockito.verify(menuService, times(1)).delete(valueId.capture());
 
         // assert
         Assertions.assertEquals(inputId, valueId.getValue());
-        Assertions.assertEquals(delete, valueDelete.getValue());
     }
 
     @Test
@@ -207,8 +202,8 @@ class MenuManagerTest {
         final MenuDtoCrudOutput dtoOutput = MenuDtoCrudOutput.builder().id(id).createdAt(creationDate).version(version)
                 .name(name).enable(enable).build();
         Mockito.when(menuMapper.inputMapping(any(MenuDtoInput.class))).thenReturn(menu);
-        Mockito.when(menuService.update(any(IMenu.class), any(Long.class), any(Integer.class))).thenReturn(menuOutput);
-        Mockito.when(menuMapper.outputCrudMapping(any(IMenu.class))).thenReturn(dtoOutput);
+        Mockito.when(menuService.update(any(Menu.class), any(Long.class), any(Integer.class))).thenReturn(menuOutput);
+        Mockito.when(menuMapper.outputCrudMapping(any(Menu.class))).thenReturn(dtoOutput);
 
         //test
         MenuDtoCrudOutput test = menuManager.update(menuDtoInput, inputId, inputVersion);
