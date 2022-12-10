@@ -6,8 +6,7 @@ import groupId.artifactId.core.dto.output.MenuDtoOutput;
 import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.core.dto.output.crud.MenuDtoCrudOutput;
 import groupId.artifactId.dao.entity.Menu;
-import groupId.artifactId.dao.entity.api.IMenu;
-import groupId.artifactId.dao.entity.api.IMenuItem;
+import groupId.artifactId.dao.entity.MenuItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -26,15 +25,15 @@ public class MenuMapper {
         this.menuItemMapper = menuItemMapper;
     }
 
-    public IMenu inputMapping(MenuDtoInput menuDtoInput) {
+    public Menu inputMapping(MenuDtoInput menuDtoInput) {
         if (menuDtoInput.getItems() == null || menuDtoInput.getItems().isEmpty()) {
             return Menu.builder()
                     .name(menuDtoInput.getName())
                     .enable(menuDtoInput.getEnable()).build();
         } else {
-            List<IMenuItem> menuItems = new ArrayList<>();
+            List<MenuItem> menuItems = new ArrayList<>();
             for (MenuItemDtoInput dtoInput : menuDtoInput.getItems()) {
-                IMenuItem menuItem = menuItemMapper.inputMapping(dtoInput);
+                MenuItem menuItem = menuItemMapper.inputMapping(dtoInput);
                 menuItems.add(menuItem);
             }
             return Menu.builder()
@@ -45,7 +44,7 @@ public class MenuMapper {
 
     }
 
-    public MenuDtoCrudOutput outputCrudMapping(IMenu menu) {
+    public MenuDtoCrudOutput outputCrudMapping(Menu menu) {
         return MenuDtoCrudOutput.builder()
                 .id(menu.getId())
                 .createdAt(menu.getCreationDate())
@@ -54,9 +53,9 @@ public class MenuMapper {
                 .enable(menu.getEnable()).build();
     }
 
-    public MenuDtoOutput outputMapping(IMenu menu) {
+    public MenuDtoOutput outputMapping(Menu menu) {
         List<MenuItemDtoOutput> items = new ArrayList<>();
-        for (IMenuItem menuItem : menu.getItems()) {
+        for (MenuItem menuItem : menu.getItems()) {
             MenuItemDtoOutput item = menuItemMapper.outputMapping(menuItem);
             items.add(item);
         }
