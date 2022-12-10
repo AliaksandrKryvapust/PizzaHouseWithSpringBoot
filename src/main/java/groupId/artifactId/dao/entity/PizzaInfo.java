@@ -1,6 +1,5 @@
 package groupId.artifactId.dao.entity;
 
-import groupId.artifactId.dao.entity.api.IPizzaInfo;
 import lombok.*;
 
 import javax.persistence.Embeddable;
@@ -11,7 +10,7 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 @Builder
 @Embeddable
-public class PizzaInfo implements IPizzaInfo {
+public class PizzaInfo {
     private String name;
     private String description;
     private Integer size;

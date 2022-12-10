@@ -1,6 +1,5 @@
 package groupId.artifactId.dao.entity;
 
-import groupId.artifactId.dao.entity.api.IMenuItem;
 import lombok.*;
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
@@ -14,7 +13,7 @@ import java.time.Instant;
 @Builder
 @Entity
 @Table(name = "menu_item", schema = "pizza_manager")
-public class MenuItem implements IMenuItem {
+public class MenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
