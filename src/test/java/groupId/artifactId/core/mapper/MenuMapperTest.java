@@ -10,8 +10,6 @@ import groupId.artifactId.core.dto.output.crud.MenuDtoCrudOutput;
 import groupId.artifactId.dao.entity.Menu;
 import groupId.artifactId.dao.entity.MenuItem;
 import groupId.artifactId.dao.entity.PizzaInfo;
-import groupId.artifactId.dao.entity.api.IMenu;
-import groupId.artifactId.dao.entity.api.IMenuItem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +39,7 @@ class MenuMapperTest {
         final MenuDtoInput menuDtoInput = MenuDtoInput.builder().name(name).enable(enable).build();
 
         //test
-        IMenu test = menuMapper.inputMapping(menuDtoInput);
+        Menu test = menuMapper.inputMapping(menuDtoInput);
 
         // assert
         Assertions.assertNotNull(test);
@@ -64,18 +62,18 @@ class MenuMapperTest {
                 .pizzaInfoDtoInput(pizzaInfoDtoInput).price(price).build());
         final MenuDtoInput menuDtoInput = MenuDtoInput.builder().name(name).enable(enable).items(menuItemsInput).build();
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(pizzaName).description(description).size(size).build();
-        final IMenuItem menuItems = MenuItem.builder().pizzaInfo(pizzaInfo).price(price).build();
+        final MenuItem menuItems = MenuItem.builder().pizzaInfo(pizzaInfo).price(price).build();
         Mockito.when(menuItemMapper.inputMapping(any(MenuItemDtoInput.class))).thenReturn(menuItems);
 
         //test
-        IMenu test = menuMapper.inputMapping(menuDtoInput);
+        Menu test = menuMapper.inputMapping(menuDtoInput);
 
         // assert
         Assertions.assertNotNull(test);
         Assertions.assertNotNull(test.getItems());
         Assertions.assertEquals(name, test.getName());
         Assertions.assertEquals(enable, test.getEnable());
-        for (IMenuItem input : test.getItems()) {
+        for (MenuItem input : test.getItems()) {
             Assertions.assertNotNull(input);
             Assertions.assertNotNull(input.getPizzaInfo());
             Assertions.assertEquals(price, input.getPrice());
@@ -93,7 +91,7 @@ class MenuMapperTest {
         final long id = 1L;
         final int version = 1;
         final Instant creationDate = Instant.now();
-        final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name).enable(enable).build();
+        final Menu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name).enable(enable).build();
 
         //test
         MenuDtoCrudOutput test = menuMapper.outputCrudMapping(menu);
@@ -120,15 +118,15 @@ class MenuMapperTest {
         final int size = 32;
         final Instant creationDate = Instant.now();
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
-        final List<IMenuItem> menuItems = Collections.singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
+        final List<MenuItem> menuItems = Collections.singletonList(MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build());
-        final IMenu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name).enable(enable)
+        final Menu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name).enable(enable)
                 .items(menuItems).build();
         final PizzaInfoDtoOutput pizzaInfoDtoOutput = PizzaInfoDtoOutput.builder().name(pizzaName).description(description)
                 .size(size).build();
         final MenuItemDtoOutput menuItemDtoOutput = MenuItemDtoOutput.builder().id(id).price(price)
                 .createdAt(creationDate).version(version).pizzaInfo(pizzaInfoDtoOutput).build();
-        Mockito.when(menuItemMapper.outputMapping(any(IMenuItem.class))).thenReturn(menuItemDtoOutput);
+        Mockito.when(menuItemMapper.outputMapping(any(MenuItem.class))).thenReturn(menuItemDtoOutput);
 
         //test
         MenuDtoOutput test = menuMapper.outputMapping(menu);
