@@ -1,6 +1,6 @@
 package groupId.artifactId.service.api;
 
-import groupId.artifactId.dao.entity.api.ITicket;
+import groupId.artifactId.dao.entity.Ticket;
 
-public interface IOrderService extends IService<ITicket> {
+public interface IOrderService extends IService<Ticket> {
 }

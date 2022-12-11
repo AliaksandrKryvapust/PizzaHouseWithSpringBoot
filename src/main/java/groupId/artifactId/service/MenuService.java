@@ -3,13 +3,10 @@ package groupId.artifactId.service;
 import groupId.artifactId.dao.api.IMenuDao;
 import groupId.artifactId.dao.entity.Menu;
 import groupId.artifactId.dao.entity.MenuItem;
-import groupId.artifactId.exceptions.DaoException;
 import groupId.artifactId.exceptions.NoContentException;
-import groupId.artifactId.exceptions.ServiceException;
 import groupId.artifactId.service.api.IMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.OptimisticLockException;
@@ -31,7 +28,7 @@ public class MenuService implements IMenuService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(readOnly = true)
     public Menu get(Long id) {
         try {
             return this.dao.findById(id).orElseThrow();
@@ -88,10 +85,6 @@ public class MenuService implements IMenuService {
         if (menu.getId() != null || menu.getVersion() != null) {
             throw new IllegalStateException("Menu id & version should be empty");
         }
-        try {
-            return this.dao.save(menu);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+        return this.dao.save(menu);
     }
 }
