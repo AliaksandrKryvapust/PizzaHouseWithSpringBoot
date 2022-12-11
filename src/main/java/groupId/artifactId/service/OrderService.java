@@ -2,9 +2,8 @@ package groupId.artifactId.service;
 
 import groupId.artifactId.core.dto.input.OrderDataDtoInput;
 import groupId.artifactId.dao.api.ITicketDao;
-import groupId.artifactId.dao.entity.api.ITicket;
-import groupId.artifactId.exceptions.DaoException;
-import groupId.artifactId.exceptions.ServiceException;
+import groupId.artifactId.dao.entity.Ticket;
+import groupId.artifactId.exceptions.NoContentException;
 import groupId.artifactId.service.api.IOrderDataService;
 import groupId.artifactId.service.api.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static groupId.artifactId.core.Constants.ORDER_START_DESCRIPTION;
 
@@ -28,33 +28,29 @@ public class OrderService implements IOrderService {
 
     @Override
     @Transactional
-    public ITicket save(ITicket orderDtoInput) {
-        try {
-            ITicket ticket = this.ticketDao.save(orderDtoInput);
-            OrderDataDtoInput dtoInput = OrderDataDtoInput.builder().ticketId(ticket.getId())
-                    .description(ORDER_START_DESCRIPTION).ticket(ticket).build();
-            orderDataService.create(dtoInput);
-            return ticket;
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
+    public Ticket save(Ticket ticket) {
+        if (ticket.getId() != null) {
+            throw new IllegalStateException("Ticket id should be empty");
         }
+        Ticket savedTicket = this.ticketDao.save(ticket);
+        OrderDataDtoInput dtoInput = OrderDataDtoInput.builder().ticketId(savedTicket.getId())
+                .description(ORDER_START_DESCRIPTION).ticket(savedTicket).build();
+        orderDataService.create(dtoInput);
+        return savedTicket;
     }
 
     @Override
-    public List<ITicket> get() {
-        try {
-            return this.ticketDao.get();
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+    public List<Ticket> get() {
+        return this.ticketDao.findAll();
     }
 
     @Override
-    public ITicket get(Long id) {
+    @Transactional(readOnly = true)
+    public Ticket get(Long id) {
         try {
-            return this.ticketDao.get(id);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
+            return this.ticketDao.findById(id).orElseThrow();
+        } catch (NoSuchElementException e) {
+            throw new NoContentException(e.getMessage());
         }
     }
 }
