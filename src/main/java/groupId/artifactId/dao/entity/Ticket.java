@@ -1,7 +1,5 @@
 package groupId.artifactId.dao.entity;
 
-import groupId.artifactId.dao.entity.api.IOrder;
-import groupId.artifactId.dao.entity.api.ITicket;
 import lombok.*;
 import org.hibernate.annotations.GenerationTime;
 
@@ -13,24 +11,23 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 @Entity
+@NamedEntityGraph(
+        name = "ticket.order.selectedItems",
+        attributeNodes = @NamedAttributeNode(value = "order", subgraph = "order.selectedItems"),
+        subgraphs = {
+                @NamedSubgraph(name = "order.selectedItems",
+                        attributeNodes = @NamedAttributeNode(value = "selectedItems", subgraph = "selectedItems.items")),
+                @NamedSubgraph(name = "selectedItems.items", attributeNodes = @NamedAttributeNode(value = "menuItem"))
+        })
 @Table(name = "ticket", schema = "pizza_manager")
-public class Ticket implements ITicket {
+public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(targetEntity = Order.class, cascade = CascadeType.PERSIST, fetch = FetchType.EAGER )
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     @Setter
-    private IOrder order;
+    private Order order;
     @org.hibernate.annotations.Generated(GenerationTime.INSERT)
     private Instant createAt;
-
-    @Override
-    public String toString() {
-        return "Ticket{" +
-                "order=" + order +
-                ", id=" + id +
-                ", createAt=" + createAt +
-                '}';
-    }
 }

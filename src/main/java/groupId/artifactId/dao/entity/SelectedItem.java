@@ -1,7 +1,5 @@
 package groupId.artifactId.dao.entity;
 
-import groupId.artifactId.dao.entity.api.IMenuItem;
-import groupId.artifactId.dao.entity.api.ISelectedItem;
 import lombok.*;
 import org.hibernate.annotations.GenerationTime;
 
@@ -14,27 +12,16 @@ import java.time.Instant;
 @Builder
 @Entity
 @Table(name = "selected_item", schema = "pizza_manager")
-public class SelectedItem implements ISelectedItem {
+public class SelectedItem{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(targetEntity = MenuItem.class, fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "menu_item_id", referencedColumnName = "id")
     @Setter
-    private IMenuItem menuItem;
+    private MenuItem menuItem;
     @Setter
     private Integer count;
-
     @org.hibernate.annotations.Generated(GenerationTime.INSERT)
     private Instant createAt;
-
-    @Override
-    public String toString() {
-        return "SelectedItem{" +
-                "menuItem=" + menuItem +
-                ", id=" + id +
-                ", count=" + count +
-                ", createAt=" + createAt +
-                '}';
-    }
 }
