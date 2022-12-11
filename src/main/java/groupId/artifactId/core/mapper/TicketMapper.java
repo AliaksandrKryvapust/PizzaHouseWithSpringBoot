@@ -3,7 +3,7 @@ package groupId.artifactId.core.mapper;
 import groupId.artifactId.core.dto.output.OrderDtoOutput;
 import groupId.artifactId.core.dto.output.TicketDtoOutput;
 import groupId.artifactId.core.dto.output.crud.TicketDtoCrudOutput;
-import groupId.artifactId.dao.entity.api.ITicket;
+import groupId.artifactId.dao.entity.Ticket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -18,7 +18,7 @@ public class TicketMapper {
         this.orderMapper = orderMapper;
     }
 
-    public TicketDtoCrudOutput outputCrudMapping(ITicket ticket) {
+    public TicketDtoCrudOutput outputCrudMapping(Ticket ticket) {
         return TicketDtoCrudOutput.builder()
                 .id(ticket.getId())
                 .orderId(ticket.getOrder().getId())
@@ -26,7 +26,7 @@ public class TicketMapper {
                 .build();
     }
 
-    public TicketDtoOutput outputMapping(ITicket ticket) {
+    public TicketDtoOutput outputMapping(Ticket ticket) {
         OrderDtoOutput orderDtoOutput = orderMapper.outputMapping(ticket.getOrder());
         return TicketDtoOutput.builder()
                 .order(orderDtoOutput)

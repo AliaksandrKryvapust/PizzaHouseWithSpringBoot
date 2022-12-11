@@ -2,8 +2,8 @@ package groupId.artifactId.core.mapper;
 
 import groupId.artifactId.core.dto.output.OrderDtoOutput;
 import groupId.artifactId.core.dto.output.SelectedItemDtoOutput;
-import groupId.artifactId.dao.entity.api.IOrder;
-import groupId.artifactId.dao.entity.api.ISelectedItem;
+import groupId.artifactId.dao.entity.Order;
+import groupId.artifactId.dao.entity.SelectedItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -21,9 +21,9 @@ public class OrderMapper {
         this.selectedItemMapper = selectedItemMapper;
     }
 
-    public OrderDtoOutput outputMapping(IOrder order) {
+    public OrderDtoOutput outputMapping(Order order) {
         List<SelectedItemDtoOutput> items = new ArrayList<>();
-        for (ISelectedItem selectedItem : order.getSelectedItems()) {
+        for (SelectedItem selectedItem : order.getSelectedItems()) {
             SelectedItemDtoOutput item = selectedItemMapper.outputMapping(selectedItem);
             items.add(item);
         }
