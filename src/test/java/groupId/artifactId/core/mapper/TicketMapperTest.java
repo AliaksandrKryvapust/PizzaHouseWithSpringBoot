@@ -3,9 +3,6 @@ package groupId.artifactId.core.mapper;
 import groupId.artifactId.core.dto.output.*;
 import groupId.artifactId.core.dto.output.crud.TicketDtoCrudOutput;
 import groupId.artifactId.dao.entity.*;
-import groupId.artifactId.dao.entity.api.IOrder;
-import groupId.artifactId.dao.entity.api.ISelectedItem;
-import groupId.artifactId.dao.entity.api.ITicket;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +30,7 @@ class TicketMapperTest {
         final long id = 1L;
         final Instant creationDate = Instant.now();
         final Order order = new Order(id, singletonList(new SelectedItem()));
-        final ITicket ticket = new Ticket(id, order, creationDate);
+        final Ticket ticket = new Ticket(id, order, creationDate);
 
         //test
         TicketDtoCrudOutput test = ticketMapper.outputCrudMapping(ticket);
@@ -59,18 +56,14 @@ class TicketMapperTest {
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
         final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build();
-        List<ISelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
+        List<SelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
                 .createAt(creationDate).build());
-        final PizzaInfoDtoOutput pizzaInfoDtoOutput = PizzaInfoDtoOutput.builder().name(name).description(description)
-                .size(size).build();
-        final MenuItemDtoOutput menuItemDtoOutput = MenuItemDtoOutput.builder().id(id).price(price)
-                .createdAt(creationDate).version(version).pizzaInfo(pizzaInfoDtoOutput).build();
-        List<SelectedItemDtoOutput> outputs = singletonList(SelectedItemDtoOutput.builder().menuItem(menuItemDtoOutput)
-                .id(id).count(count).createdAt(creationDate).build());
+        List<SelectedItemDtoOutput> outputs = singletonList(SelectedItemDtoOutput.builder()
+                .id(id).count(count).createdAt(creationDate).menuItemId(id).build());
         final Order order = new Order(id, selectedItems);
-        final ITicket ticket = new Ticket(id, order, creationDate);
+        final Ticket ticket = new Ticket(id, order, creationDate);
         final OrderDtoOutput dtoOutput = new OrderDtoOutput(outputs, id);
-        Mockito.when(orderMapper.outputMapping(any(IOrder.class))).thenReturn(dtoOutput);
+        Mockito.when(orderMapper.outputMapping(any(Order.class))).thenReturn(dtoOutput);
 
         //test
         TicketDtoOutput test = ticketMapper.outputMapping(ticket);
@@ -83,18 +76,9 @@ class TicketMapperTest {
         Assertions.assertEquals(creationDate, test.getCreatedAt());
         Assertions.assertEquals(id, test.getOrder().getId());
         for (SelectedItemDtoOutput output : test.getOrder().getSelectedItems()) {
-            Assertions.assertNotNull(output.getMenuItem());
-            Assertions.assertNotNull(output.getMenuItem().getPizzaInfo());
             Assertions.assertEquals(id, output.getId());
             Assertions.assertEquals(count, output.getCount());
             Assertions.assertEquals(creationDate, output.getCreatedAt());
-            Assertions.assertEquals(id, output.getMenuItem().getId());
-            Assertions.assertEquals(price, output.getMenuItem().getPrice());
-            Assertions.assertEquals(creationDate, output.getMenuItem().getCreatedAt());
-            Assertions.assertEquals(version, output.getMenuItem().getVersion());
-            Assertions.assertEquals(name, output.getMenuItem().getPizzaInfo().getName());
-            Assertions.assertEquals(description, output.getMenuItem().getPizzaInfo().getDescription());
-            Assertions.assertEquals(size, output.getMenuItem().getPizzaInfo().getSize());
         }
     }
 }
