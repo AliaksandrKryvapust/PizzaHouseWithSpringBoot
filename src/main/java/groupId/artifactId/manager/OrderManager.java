@@ -6,18 +6,17 @@ import groupId.artifactId.core.dto.output.TicketDtoOutput;
 import groupId.artifactId.core.dto.output.crud.TicketDtoCrudOutput;
 import groupId.artifactId.core.mapper.SelectedItemMapper;
 import groupId.artifactId.core.mapper.TicketMapper;
+import groupId.artifactId.dao.entity.MenuItem;
 import groupId.artifactId.dao.entity.Order;
+import groupId.artifactId.dao.entity.SelectedItem;
 import groupId.artifactId.dao.entity.Ticket;
-import groupId.artifactId.dao.entity.api.IMenuItem;
-import groupId.artifactId.dao.entity.api.IOrder;
-import groupId.artifactId.dao.entity.api.ISelectedItem;
-import groupId.artifactId.dao.entity.api.ITicket;
 import groupId.artifactId.exceptions.NoContentException;
 import groupId.artifactId.exceptions.ServiceException;
 import groupId.artifactId.manager.api.IOrderManager;
 import groupId.artifactId.service.api.IMenuItemService;
 import groupId.artifactId.service.api.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -44,16 +43,16 @@ public class OrderManager implements IOrderManager {
         try {
             List<Long> menuItemsId = orderDtoInput.getSelectedItems().stream().map(SelectedItemDtoInput::getMenuItemId)
                     .collect(Collectors.toList());
-            List<IMenuItem> menuItems = this.menuItemService.getListById(menuItemsId);
-            List<ISelectedItem> inputSelectedItems = orderDtoInput.getSelectedItems().stream()
+            List<MenuItem> menuItems = this.menuItemService.getListById(menuItemsId);
+            List<SelectedItem> inputSelectedItems = orderDtoInput.getSelectedItems().stream()
                     .map((i) -> selectedItemMapper.inputMapping(i, menuItems)).collect(Collectors.toList());
-            IOrder newOrder = Order.builder().selectedItems(inputSelectedItems).build();
-            ITicket ticket = this.orderService.save(Ticket.builder().order(newOrder).build());
+            Order newOrder = Order.builder().selectedItems(inputSelectedItems).build();
+            Ticket ticket = this.orderService.save(Ticket.builder().order(newOrder).build());
             return ticketMapper.outputCrudMapping(ticket);
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
-        } catch (IllegalStateException e) {
-            throw new IllegalStateException(e);
+        } catch (DataIntegrityViolationException e) {
+            throw new NoContentException("menu table save failed, check preconditions and FK values");
         } catch (Exception e) {
             throw new ServiceException("Failed to save Order" + orderDtoInput, e);
         }
@@ -83,7 +82,8 @@ public class OrderManager implements IOrderManager {
     @Override
     public TicketDtoOutput getAllData(Long id) {
         try {
-            return ticketMapper.outputMapping(this.orderService.get(id));
+            Ticket ticket = this.orderService.get(id);
+            return ticketMapper.outputMapping(ticket);
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
         } catch (Exception e) {
