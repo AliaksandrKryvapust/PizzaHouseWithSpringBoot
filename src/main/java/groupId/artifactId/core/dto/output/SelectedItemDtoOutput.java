@@ -11,7 +11,7 @@ import java.time.Instant;
 @Getter
 @ToString
 public class SelectedItemDtoOutput {
-    private final @NonNull MenuItemDtoOutput menuItem;
+    private final @NonNull Long menuItemId;
     private final @NonNull Long id;
     private final @NonNull Integer count;
     private final @NonNull Instant createdAt;
