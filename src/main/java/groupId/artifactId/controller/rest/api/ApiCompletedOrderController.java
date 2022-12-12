@@ -29,11 +29,26 @@ public class ApiCompletedOrderController {
     }
 
     //Read POSITION
-    //1)  Read item need ticket id param
+    //1)  Read item need id param
     @GetMapping("/{id}")
     protected ResponseEntity<CompletedOrderDtoOutput> get(@PathVariable long id) {
         try {
             return ResponseEntity.ok(completedOrderManager.getAllData(id));
+        } catch (NoContentException e) {
+            logger.error("/api/completed_order there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            logger.error("/api/completed_order crashed during doGet method" + e.getMessage() + "\t" + e.getCause());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //Read POSITION
+    //1)  Read item need ticket id param
+    @GetMapping("ticket/{id}")
+    protected ResponseEntity<CompletedOrderDtoOutput> getByTicket(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok(completedOrderManager.getCompletedOrderByTicket(id));
         } catch (NoContentException e) {
             logger.error("/api/completed_order there is no content to fulfill doGet method " + e.getMessage() + "\t" + e.getCause());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
