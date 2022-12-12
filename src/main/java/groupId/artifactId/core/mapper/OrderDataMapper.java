@@ -2,10 +2,9 @@ package groupId.artifactId.core.mapper;
 
 import groupId.artifactId.core.dto.output.OrderDataDtoOutput;
 import groupId.artifactId.core.dto.output.OrderStageDtoOutput;
-import groupId.artifactId.core.dto.output.TicketDtoOutput;
 import groupId.artifactId.core.dto.output.crud.OrderDataDtoCrudOutput;
-import groupId.artifactId.dao.entity.api.IOrderData;
-import groupId.artifactId.dao.entity.api.IOrderStage;
+import groupId.artifactId.dao.entity.OrderData;
+import groupId.artifactId.dao.entity.OrderStage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -18,15 +17,13 @@ import java.util.List;
 @Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class OrderDataMapper {
     private final OrderStageMapper orderStageMapper;
-    private final TicketMapper ticketMapper;
 
     @Autowired
-    public OrderDataMapper(OrderStageMapper orderStageMapper, TicketMapper ticketMapper) {
+    public OrderDataMapper(OrderStageMapper orderStageMapper) {
         this.orderStageMapper = orderStageMapper;
-        this.ticketMapper = ticketMapper;
     }
 
-    public OrderDataDtoCrudOutput outputCrudMapping(IOrderData orderData) {
+    public OrderDataDtoCrudOutput outputCrudMapping(OrderData orderData) {
         return OrderDataDtoCrudOutput.builder()
                 .id(orderData.getId())
                 .ticketId(orderData.getTicket().getId())
@@ -35,15 +32,14 @@ public class OrderDataMapper {
                 .build();
     }
 
-    public OrderDataDtoOutput outputMapping(IOrderData orderData) {
+    public OrderDataDtoOutput outputMapping(OrderData orderData) {
         List<OrderStageDtoOutput> stageDtoOutputs = new ArrayList<>();
-        for (IOrderStage stage : orderData.getOrderHistory()) {
+        for (OrderStage stage : orderData.getOrderHistory()) {
             OrderStageDtoOutput output = orderStageMapper.outputMapping(stage);
             stageDtoOutputs.add(output);
         }
-        TicketDtoOutput ticketDtoOutPut = ticketMapper.outputMapping(orderData.getTicket());
         return OrderDataDtoOutput.builder()
-                .ticket(ticketDtoOutPut)
+                .ticketId(orderData.getTicket().getId())
                 .orderHistory(stageDtoOutputs)
                 .id(orderData.getId())
                 .done(orderData.getDone())
