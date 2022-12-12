@@ -6,4 +6,5 @@ import groupId.artifactId.core.dto.output.crud.OrderDataDtoCrudOutput;
 
 public interface IOrderDataManager extends IManager<OrderDataDtoCrudOutput, OrderDataDtoInput> {
     OrderDataDtoOutput getAllData(Long id);
+    OrderDataDtoOutput getOrderDataByTicket(Long id);
 }
