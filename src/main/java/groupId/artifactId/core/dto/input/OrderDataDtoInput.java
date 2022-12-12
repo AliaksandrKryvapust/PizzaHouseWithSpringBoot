@@ -1,6 +1,6 @@
 package groupId.artifactId.core.dto.input;
 
-import groupId.artifactId.dao.entity.api.ITicket;
+import groupId.artifactId.dao.entity.Ticket;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
@@ -17,5 +17,5 @@ public class OrderDataDtoInput {
     private final Long ticketId;
     @NotBlank(message = "description cannot be empty")
     private final String description;
-    private final ITicket ticket;
+    private final Ticket ticket;
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @ToString
 public class OrderDataDtoOutput {
-    private final @NonNull TicketDtoOutput ticket;
+    private final @NonNull Long ticketId;
     private final @NonNull List<OrderStageDtoOutput> orderHistory;
     private final @NonNull Long id;
     private final @NonNull Boolean done;
