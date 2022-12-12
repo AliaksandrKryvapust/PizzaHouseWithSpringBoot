@@ -5,10 +5,8 @@ import groupId.artifactId.core.mapper.CompletedOrderMapper;
 import groupId.artifactId.core.mapper.OrderStageMapper;
 import groupId.artifactId.dao.api.IOrderDataDao;
 import groupId.artifactId.dao.entity.OrderData;
-import groupId.artifactId.dao.entity.api.IOrderData;
-import groupId.artifactId.dao.entity.api.IOrderStage;
-import groupId.artifactId.exceptions.DaoException;
-import groupId.artifactId.exceptions.ServiceException;
+import groupId.artifactId.dao.entity.OrderStage;
+import groupId.artifactId.exceptions.NoContentException;
 import groupId.artifactId.service.api.ICompletedOrderService;
 import groupId.artifactId.service.api.IOrderDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static groupId.artifactId.core.Constants.ORDER_FINISH_DESCRIPTION;
 import static java.util.Collections.singletonList;
@@ -38,50 +37,56 @@ public class OrderDataService implements IOrderDataService {
 
     @Override
     public void create(OrderDataDtoInput dtoInput) {
-        IOrderStage inputOrderStages = this.orderStageMapper.inputMapping(dtoInput.getDescription());
+        OrderStage inputOrderStages = this.orderStageMapper.inputMapping(dtoInput.getDescription());
         OrderData orderData = OrderData.builder().orderHistory(singletonList(inputOrderStages))
                 .ticket(dtoInput.getTicket()).build();
+        if (orderData.getId() != null) {
+            throw new IllegalStateException("Order data id should be empty");
+        }
         orderDataDao.save(orderData);
     }
 
     @Override
     @Transactional
-    public IOrderData saveInTransaction(OrderDataDtoInput dtoInput) {
+    public OrderData saveInTransaction(OrderDataDtoInput dtoInput) {
+        OrderStage inputOrderStages = this.orderStageMapper.inputMapping(dtoInput.getDescription());
+        OrderData orderData = this.findOrderDataByTicketId(dtoInput.getTicketId());
+        orderData.getOrderHistory().add(inputOrderStages);
+        orderData.setDone(inputOrderStages.getDescription().equals(ORDER_FINISH_DESCRIPTION));
+        OrderData orderDataOutput = this.orderDataDao.saveAndFlush(orderData);
+        if (inputOrderStages.getDescription().equals(ORDER_FINISH_DESCRIPTION)) {
+            this.completedOrderService.create(completedOrderMapper.inputMapping(orderDataOutput));
+        }
+        return orderDataOutput;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderData findOrderDataByTicketId(Long id) {
         try {
-            IOrderStage inputOrderStages = this.orderStageMapper.inputMapping(dtoInput.getDescription());
-            OrderData orderData = (OrderData) this.orderDataDao.get(dtoInput.getTicketId());
-            orderData.getOrderHistory().add(inputOrderStages);
-            orderData.setDone(inputOrderStages.getDescription().equals(ORDER_FINISH_DESCRIPTION));
-            IOrderData orderDataOutput = this.save(orderData);
-            if (inputOrderStages.getDescription().equals(ORDER_FINISH_DESCRIPTION)) {
-                this.completedOrderService.create(completedOrderMapper.inputMapping(orderDataOutput));
-            }
-            return orderDataOutput;
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
+            return this.orderDataDao.findOrderDataByTicket_Id(id).orElseThrow();
+        } catch (NoSuchElementException e) {
+            throw new NoContentException(e.getMessage());
         }
     }
 
     @Override
-    public IOrderData save(IOrderData orderData) {
-        return this.orderDataDao.update(orderData);
+    public OrderData save(OrderData orderData) {
+        return this.orderDataDao.save(orderData);
     }
 
     @Override
-    public List<IOrderData> get() {
-        try {
-            return this.orderDataDao.get();
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+    public List<OrderData> get() {
+        return this.orderDataDao.findAll();
     }
 
     @Override
-    public IOrderData get(Long id) {
+    @Transactional(readOnly = true)
+    public OrderData get(Long id) {
         try {
-            return this.orderDataDao.get(id);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
+            return this.orderDataDao.findById(id).orElseThrow();
+        } catch (NoSuchElementException e) {
+            throw new NoContentException(e.getMessage());
         }
     }
 }

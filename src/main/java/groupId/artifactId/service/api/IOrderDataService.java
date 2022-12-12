@@ -1,13 +1,10 @@
 package groupId.artifactId.service.api;
 
 import groupId.artifactId.core.dto.input.OrderDataDtoInput;
-import groupId.artifactId.core.dto.output.OrderDataDtoOutput;
-import groupId.artifactId.core.dto.output.crud.OrderDataDtoCrudOutput;
-import groupId.artifactId.dao.entity.api.IOrderData;
+import groupId.artifactId.dao.entity.OrderData;
 
-import javax.persistence.EntityManager;
-
-public interface IOrderDataService extends IService<IOrderData> {
+public interface IOrderDataService extends IService<OrderData> {
     void create(OrderDataDtoInput dtoInput);
-    IOrderData saveInTransaction(OrderDataDtoInput dtoInput);
+    OrderData saveInTransaction(OrderDataDtoInput dtoInput);
+    OrderData findOrderDataByTicketId(Long id);
 }
