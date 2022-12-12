@@ -8,9 +8,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+import static groupId.artifactId.core.Constants.MENU_ENTITY_GRAPH;
+
 @Repository
 public interface IMenuDao extends JpaRepository<Menu, Long> {
-    @EntityGraph(value = "Menu.items")
+    @EntityGraph(value = MENU_ENTITY_GRAPH)
     @NonNull Optional<Menu> findById(@NonNull Long id);
 }
 
