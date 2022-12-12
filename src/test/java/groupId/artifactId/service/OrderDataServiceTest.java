@@ -2,12 +2,8 @@ package groupId.artifactId.service;
 
 import groupId.artifactId.core.dto.input.OrderDataDtoInput;
 import groupId.artifactId.core.mapper.OrderStageMapper;
-import groupId.artifactId.dao.OrderDataDao;
+import groupId.artifactId.dao.api.IOrderDataDao;
 import groupId.artifactId.dao.entity.*;
-import groupId.artifactId.dao.entity.api.IOrderData;
-import groupId.artifactId.dao.entity.api.IOrderStage;
-import groupId.artifactId.dao.entity.api.ISelectedItem;
-import groupId.artifactId.dao.entity.api.ITicket;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static groupId.artifactId.core.Constants.ORDER_FINISH_DESCRIPTION;
 import static java.util.Collections.singletonList;
@@ -31,7 +28,7 @@ class OrderDataServiceTest {
     @InjectMocks
     private OrderDataService orderDataService;
     @Mock
-    private OrderDataDao orderDataDao;
+    private IOrderDataDao orderDataDao;
     @Mock
     private OrderStageMapper orderStageMapper;
 
@@ -50,22 +47,22 @@ class OrderDataServiceTest {
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
         final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build();
-        List<ISelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
+        List<SelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
                 .createAt(creationDate).build());
         final Order order = new Order(id, selectedItems);
-        final ITicket ticket = new Ticket(id, order, creationDate);
+        final Ticket ticket = new Ticket(id, order, creationDate);
         final OrderDataDtoInput orderDataDtoInput = OrderDataDtoInput.builder().ticketId(id).description(ORDER_FINISH_DESCRIPTION).build();
-        IOrderStage stage = OrderStage.builder().description(description).id(id).creationDate(creationDate).build();
-        List<IOrderStage> stages = new ArrayList<>();
+        OrderStage stage = OrderStage.builder().description(description).id(id).creationDate(creationDate).build();
+        List<OrderStage> stages = new ArrayList<>();
         stages.add(stage);
-        final IOrderData orderData = OrderData.builder().id(id).orderHistory(stages).done(done).ticket(ticket)
+        final OrderData orderData = OrderData.builder().id(id).orderHistory(stages).done(done).ticket(ticket)
                 .creationDate(creationDate).build();
         Mockito.when(orderStageMapper.inputMapping(any(String.class))).thenReturn(stage);
-        Mockito.when(orderDataDao.get(any(Long.class))).thenReturn(orderData);
-        Mockito.when(orderDataDao.update(any(IOrderData.class))).thenReturn(orderData);
+        Mockito.when(orderDataDao.findOrderDataByTicket_Id(any(Long.class))).thenReturn(Optional.of(orderData));
+        Mockito.when(orderDataDao.saveAndFlush(any(OrderData.class))).thenReturn(orderData);
 
         //test
-        IOrderData test = orderDataService.saveInTransaction(orderDataDtoInput);
+        OrderData test = orderDataService.saveInTransaction(orderDataDtoInput);
 
         // assert
         Assertions.assertNotNull(test);
@@ -90,16 +87,16 @@ class OrderDataServiceTest {
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
         final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build();
-        List<ISelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
+        List<SelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
                 .createAt(creationDate).build());
         final Order order = new Order(id, selectedItems);
-        final ITicket ticket = new Ticket(id, order, creationDate);
+        final Ticket ticket = new Ticket(id, order, creationDate);
         final OrderDataDtoInput orderDataDtoInput = OrderDataDtoInput.builder().ticketId(id).ticket(ticket).description(stageDescription).build();
-        IOrderStage stages = OrderStage.builder().description(description).id(id).creationDate(creationDate).build();
-        final IOrderData orderData = OrderData.builder().id(id).orderHistory(singletonList(stages)).done(done).ticket(ticket)
+        OrderStage stages = OrderStage.builder().description(description).id(id).creationDate(creationDate).build();
+        final OrderData orderData = OrderData.builder().id(id).orderHistory(singletonList(stages)).done(done).ticket(ticket)
                 .creationDate(creationDate).build();
         Mockito.when(orderStageMapper.inputMapping(any(String.class))).thenReturn(stages);
-        Mockito.when(orderDataDao.save(any(IOrderData.class))).thenReturn(orderData);
+        Mockito.when(orderDataDao.save(any(OrderData.class))).thenReturn(orderData);
         ArgumentCaptor<OrderData> value = ArgumentCaptor.forClass(OrderData.class);
 
         //test
@@ -127,23 +124,23 @@ class OrderDataServiceTest {
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
         final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build();
-        List<ISelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
+        List<SelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
                 .createAt(creationDate).build());
         final Order order = new Order(id, selectedItems);
-        final ITicket ticket = new Ticket(id, order, creationDate);
-        List<IOrderStage> orderStages = singletonList(OrderStage.builder().id(id).description(stageDescription)
+        final Ticket ticket = new Ticket(id, order, creationDate);
+        List<OrderStage> orderStages = singletonList(OrderStage.builder().id(id).description(stageDescription)
                 .creationDate(creationDate).build());
-        IOrderStage stages = OrderStage.builder().description(description).id(id).creationDate(creationDate).build();
-        final IOrderData orderData = OrderData.builder().id(id).orderHistory(singletonList(stages)).done(done).ticket(ticket)
+        OrderStage stages = OrderStage.builder().description(description).id(id).creationDate(creationDate).build();
+        final OrderData orderData = OrderData.builder().id(id).orderHistory(singletonList(stages)).done(done).ticket(ticket)
                 .creationDate(creationDate).orderHistory(orderStages).build();
-        Mockito.when(orderDataDao.get()).thenReturn(singletonList(orderData));
+        Mockito.when(orderDataDao.findAll()).thenReturn(singletonList(orderData));
 
         //test
-        List<IOrderData> test = orderDataService.get();
+        List<OrderData> test = orderDataService.get();
 
         // assert
         Assertions.assertEquals(singletonList(orderData).size(), test.size());
-        for (IOrderData output : test) {
+        for (OrderData output : test) {
             Assertions.assertNotNull(output);
             Assertions.assertEquals(id, output.getId());
             Assertions.assertEquals(done, output.getDone());
@@ -167,19 +164,56 @@ class OrderDataServiceTest {
         final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
         final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
                 .creationDate(creationDate).version(version).build();
-        List<ISelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
+        List<SelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
                 .createAt(creationDate).build());
         final Order order = new Order(id, selectedItems);
-        final ITicket ticket = new Ticket(id, order, creationDate);
-        List<IOrderStage> orderStages = singletonList(OrderStage.builder().id(id).description(stageDescription)
+        final Ticket ticket = new Ticket(id, order, creationDate);
+        List<OrderStage> orderStages = singletonList(OrderStage.builder().id(id).description(stageDescription)
                 .creationDate(creationDate).build());
-        IOrderStage stages = OrderStage.builder().description(description).id(id).creationDate(creationDate).build();
-        final IOrderData orderData = OrderData.builder().id(id).orderHistory(singletonList(stages)).done(done).ticket(ticket)
+        OrderStage stages = OrderStage.builder().description(description).id(id).creationDate(creationDate).build();
+        final OrderData orderData = OrderData.builder().id(id).orderHistory(singletonList(stages)).done(done).ticket(ticket)
                 .creationDate(creationDate).orderHistory(orderStages).build();
-        Mockito.when(orderDataDao.get(id)).thenReturn(orderData);
+        Mockito.when(orderDataDao.findById(id)).thenReturn(Optional.of(orderData));
 
         //test
-        IOrderData test = orderDataService.get(id);
+        OrderData test = orderDataService.get(id);
+
+        // assert
+        Assertions.assertNotNull(test);
+        Assertions.assertEquals(id, test.getId());
+        Assertions.assertEquals(done, test.getDone());
+        Assertions.assertEquals(creationDate, test.getCreationDate());
+    }
+
+    @Test
+    void findOrderDataByTicketId() {
+        // preconditions
+        final long id = 1L;
+        final int version = 1;
+        final int count = 10;
+        final double price = 18.0;
+        final String name = "ITALIANO PIZZA";
+        final String description = "Mozzarella cheese, basilica, ham";
+        final String stageDescription = "Stage #";
+        final int size = 32;
+        final boolean done = false;
+        final Instant creationDate = Instant.now();
+        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
+        final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
+                .creationDate(creationDate).version(version).build();
+        List<SelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
+                .createAt(creationDate).build());
+        final Order order = new Order(id, selectedItems);
+        final Ticket ticket = new Ticket(id, order, creationDate);
+        List<OrderStage> orderStages = singletonList(OrderStage.builder().id(id).description(stageDescription)
+                .creationDate(creationDate).build());
+        OrderStage stages = OrderStage.builder().description(description).id(id).creationDate(creationDate).build();
+        final OrderData orderData = OrderData.builder().id(id).orderHistory(singletonList(stages)).done(done).ticket(ticket)
+                .creationDate(creationDate).orderHistory(orderStages).build();
+        Mockito.when(orderDataDao.findOrderDataByTicket_Id(id)).thenReturn(Optional.of(orderData));
+
+        //test
+        OrderData test = orderDataService.findOrderDataByTicketId(id);
 
         // assert
         Assertions.assertNotNull(test);
