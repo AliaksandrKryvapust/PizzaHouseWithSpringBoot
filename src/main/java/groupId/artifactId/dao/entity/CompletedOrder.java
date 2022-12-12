@@ -1,8 +1,5 @@
 package groupId.artifactId.dao.entity;
 
-import groupId.artifactId.dao.entity.api.ICompletedOrder;
-import groupId.artifactId.dao.entity.api.IPizza;
-import groupId.artifactId.dao.entity.api.ITicket;
 import lombok.*;
 import org.hibernate.annotations.GenerationTime;
 
@@ -10,34 +7,28 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.List;
 
+import static groupId.artifactId.core.Constants.COMPLETED_ORDER_ENTITY_GRAPH;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
+@NamedEntityGraph(name = COMPLETED_ORDER_ENTITY_GRAPH,
+        attributeNodes = {@NamedAttributeNode("items"), @NamedAttributeNode("ticket")})
 @Table(name = "completed_order", schema = "pizza_manager")
-public class CompletedOrder implements ICompletedOrder {
+public class CompletedOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(targetEntity = Ticket.class, fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "ticket_id", referencedColumnName = "id")
     @Setter
-    private ITicket ticket;
-    @OneToMany(targetEntity = Pizza.class, cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private Ticket ticket;
+    @OneToMany(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "completed_order_id", referencedColumnName = "id", nullable = false)
     @Setter
-    private List<IPizza> items;
+    private List<Pizza> items;
     @org.hibernate.annotations.Generated(GenerationTime.INSERT)
     private Instant creationDate;
-
-    @Override
-    public String toString() {
-        return "CompletedOrder{" +
-                "ticket=" + ticket +
-                ", items=" + items +
-                ", id=" + id +
-                ", creationDate=" + creationDate +
-                '}';
-    }
 }
