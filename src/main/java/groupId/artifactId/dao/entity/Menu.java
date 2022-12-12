@@ -7,12 +7,14 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.List;
 
+import static groupId.artifactId.core.Constants.MENU_ENTITY_GRAPH;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-@NamedEntityGraph(name = "Menu.items", attributeNodes = @NamedAttributeNode("items"))
+@NamedEntityGraph(name = MENU_ENTITY_GRAPH, attributeNodes = @NamedAttributeNode("items"))
 @Table(name = "menu", schema = "pizza_manager")
 public class Menu {
     @Id

@@ -52,7 +52,7 @@ public class OrderManager implements IOrderManager {
         } catch (NoContentException e) {
             throw new NoContentException(e.getMessage());
         } catch (DataIntegrityViolationException e) {
-            throw new NoContentException("menu table save failed, check preconditions and FK values");
+            throw new NoContentException("order table or order data table save failed, check preconditions and FK values");
         } catch (Exception e) {
             throw new ServiceException("Failed to save Order" + orderDtoInput, e);
         }

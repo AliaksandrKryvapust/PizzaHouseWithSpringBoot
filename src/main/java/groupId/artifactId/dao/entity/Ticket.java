@@ -6,13 +6,15 @@ import org.hibernate.annotations.GenerationTime;
 import javax.persistence.*;
 import java.time.Instant;
 
+import static groupId.artifactId.core.Constants.TICKET_ENTITY_GRAPH;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @NamedEntityGraph(
-        name = "ticket.order.selectedItems",
+        name = TICKET_ENTITY_GRAPH,
         attributeNodes = @NamedAttributeNode(value = "order", subgraph = "order.selectedItems"),
         subgraphs = {
                 @NamedSubgraph(name = "order.selectedItems",
