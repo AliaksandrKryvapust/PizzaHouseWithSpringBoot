@@ -1,11 +1,8 @@
 package groupId.artifactId.service.api;
 
-import groupId.artifactId.core.dto.output.CompletedOrderDtoOutput;
-import groupId.artifactId.core.dto.output.crud.CompletedOrderDtoCrudOutput;
-import groupId.artifactId.dao.entity.api.ICompletedOrder;
+import groupId.artifactId.dao.entity.CompletedOrder;
 
-import javax.persistence.EntityManager;
-
-public interface ICompletedOrderService extends IService<ICompletedOrder> {
-    ICompletedOrder create(ICompletedOrder type);
+public interface ICompletedOrderService extends IService<CompletedOrder> {
+    CompletedOrder create(CompletedOrder type);
+    CompletedOrder findCompletedOrderByTicketId(Long id);
 }

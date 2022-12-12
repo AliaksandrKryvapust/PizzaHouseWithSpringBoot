@@ -1,15 +1,15 @@
 package groupId.artifactId.service;
 
 import groupId.artifactId.dao.api.ICompletedOrderDao;
-import groupId.artifactId.dao.entity.api.ICompletedOrder;
-import groupId.artifactId.exceptions.DaoException;
-import groupId.artifactId.exceptions.ServiceException;
+import groupId.artifactId.dao.entity.CompletedOrder;
+import groupId.artifactId.exceptions.NoContentException;
 import groupId.artifactId.service.api.ICompletedOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class CompletedOrderService implements ICompletedOrderService {
@@ -21,35 +21,41 @@ public class CompletedOrderService implements ICompletedOrderService {
     }
 
     @Override
-    public ICompletedOrder create(ICompletedOrder type) {
+    public CompletedOrder create(CompletedOrder type) {
         return this.completedOrderDao.save(type);
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public CompletedOrder findCompletedOrderByTicketId(Long id) {
+        try {
+            return this.completedOrderDao.findCompletedOrderByTicket_Id(id).orElseThrow();
+        } catch (NoSuchElementException e) {
+            throw new NoContentException(e.getMessage());
+        }
+    }
+
+    @Override
     @Transactional
-    public ICompletedOrder save(ICompletedOrder type) {
-        try {
-            return this.completedOrderDao.save(type);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
+    public CompletedOrder save(CompletedOrder completedOrder) {
+        if (completedOrder.getId() != null) {
+            throw new IllegalStateException("Completed order id should be empty");
         }
+        return this.completedOrderDao.save(completedOrder);
     }
 
     @Override
-    public List<ICompletedOrder> get() {
-        try {
-            return this.completedOrderDao.get();
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+    public List<CompletedOrder> get() {
+        return this.completedOrderDao.findAll();
     }
 
     @Override
-    public ICompletedOrder get(Long id) {
+    @Transactional(readOnly = true)
+    public CompletedOrder get(Long id) {
         try {
-            return this.completedOrderDao.get(id);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
+            return this.completedOrderDao.findById(id).orElseThrow();
+        } catch (NoSuchElementException e) {
+            throw new NoContentException(e.getMessage());
         }
     }
 }
