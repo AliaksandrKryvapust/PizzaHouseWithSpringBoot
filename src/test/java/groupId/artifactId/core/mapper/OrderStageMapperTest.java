@@ -2,7 +2,6 @@ package groupId.artifactId.core.mapper;
 
 import groupId.artifactId.core.dto.output.OrderStageDtoOutput;
 import groupId.artifactId.dao.entity.OrderStage;
-import groupId.artifactId.dao.entity.api.IOrderStage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +21,7 @@ class OrderStageMapperTest {
         final String description = "Order accepted";
 
         //test
-        IOrderStage test = orderStageMapper.inputMapping(description);
+        OrderStage test = orderStageMapper.inputMapping(description);
 
         // assert
         Assertions.assertNotNull(test);
@@ -35,7 +34,7 @@ class OrderStageMapperTest {
         final long id = 1L;
         final String stageDescription = "Stage #";
         final Instant creationDate = Instant.now();
-        IOrderStage orderStages = OrderStage.builder().id(id).description(stageDescription).creationDate(creationDate).build();
+        OrderStage orderStages = OrderStage.builder().id(id).description(stageDescription).creationDate(creationDate).build();
 
         //test
         OrderStageDtoOutput test = orderStageMapper.outputMapping(orderStages);
