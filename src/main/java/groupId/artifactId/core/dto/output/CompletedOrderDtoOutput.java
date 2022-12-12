@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @ToString
 public class CompletedOrderDtoOutput {
-    private final @NonNull TicketDtoOutput ticket;
+    private final @NonNull Long ticketId;
     private final @NonNull List<PizzaDtoOutput> items;
     private final @NonNull Long id;
     private final @NonNull Instant createdAt;
