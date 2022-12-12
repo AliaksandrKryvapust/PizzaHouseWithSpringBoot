@@ -2,7 +2,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
          http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-    <display-name>it_acad_HW_PizzaHouse</display-name>
+    <display-name>it_acad_HW_PizzaHouse_Spring</display-name>
     <filter>
         <filter-name>ContentTypeAndEncodingFilter</filter-name>
         <filter-class>groupId.artifactId.controller.filter.api.ContentTypeAndEncodingFilter</filter-class>
