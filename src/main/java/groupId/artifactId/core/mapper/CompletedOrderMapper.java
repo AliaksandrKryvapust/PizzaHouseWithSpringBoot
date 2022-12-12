@@ -2,14 +2,11 @@ package groupId.artifactId.core.mapper;
 
 import groupId.artifactId.core.dto.output.CompletedOrderDtoOutput;
 import groupId.artifactId.core.dto.output.PizzaDtoOutput;
-import groupId.artifactId.core.dto.output.TicketDtoOutput;
 import groupId.artifactId.core.dto.output.crud.CompletedOrderDtoCrudOutput;
 import groupId.artifactId.dao.entity.CompletedOrder;
+import groupId.artifactId.dao.entity.OrderData;
 import groupId.artifactId.dao.entity.Pizza;
-import groupId.artifactId.dao.entity.api.ICompletedOrder;
-import groupId.artifactId.dao.entity.api.IOrderData;
-import groupId.artifactId.dao.entity.api.IPizza;
-import groupId.artifactId.dao.entity.api.ITicket;
+import groupId.artifactId.dao.entity.Ticket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -21,24 +18,22 @@ import java.util.stream.Collectors;
 @Component
 @Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CompletedOrderMapper {
-
-    private final TicketMapper ticketMapper;
     private final PizzaMapper pizzaMapper;
+
     @Autowired
-    public CompletedOrderMapper(TicketMapper ticketMapper, PizzaMapper pizzaMapper) {
-        this.ticketMapper = ticketMapper;
+    public CompletedOrderMapper(PizzaMapper pizzaMapper) {
         this.pizzaMapper = pizzaMapper;
     }
 
-    public ICompletedOrder inputMapping(IOrderData orderData) {
-        ITicket ticket = orderData.getTicket();
-        List<IPizza> temp = ticket.getOrder().getSelectedItems().stream().map((i) -> Pizza.builder()
+    public CompletedOrder inputMapping(OrderData orderData) {
+        Ticket ticket = orderData.getTicket();
+        List<Pizza> temp = ticket.getOrder().getSelectedItems().stream().map((i) -> Pizza.builder()
                         .name(i.getMenuItem().getPizzaInfo().getName()).size(i.getMenuItem().getPizzaInfo().getSize()).build())
                 .collect(Collectors.toList());
         return CompletedOrder.builder().ticket(ticket).items(temp).build();
     }
 
-    public CompletedOrderDtoCrudOutput outputCrudMapping(ICompletedOrder completedOrder) {
+    public CompletedOrderDtoCrudOutput outputCrudMapping(CompletedOrder completedOrder) {
         return CompletedOrderDtoCrudOutput.builder()
                 .id(completedOrder.getId())
                 .ticketId(completedOrder.getTicket().getId())
@@ -46,11 +41,10 @@ public class CompletedOrderMapper {
                 .build();
     }
 
-    public CompletedOrderDtoOutput outputMapping(ICompletedOrder completedOrder) {
+    public CompletedOrderDtoOutput outputMapping(CompletedOrder completedOrder) {
         List<PizzaDtoOutput> temp = completedOrder.getItems().stream().map(pizzaMapper::outputMapping).collect(Collectors.toList());
-        TicketDtoOutput ticketDtoOutPut = ticketMapper.outputMapping(completedOrder.getTicket());
         return CompletedOrderDtoOutput.builder()
-                .ticket(ticketDtoOutPut)
+                .ticketId(completedOrder.getTicket().getId())
                 .items(temp)
                 .id(completedOrder.getId())
                 .createdAt(completedOrder.getCreationDate())
