@@ -1,6 +1,5 @@
 package groupId.artifactId.dao.entity;
 
-import groupId.artifactId.dao.entity.api.IOrderStage;
 import lombok.*;
 import org.hibernate.annotations.GenerationTime;
 
@@ -13,7 +12,7 @@ import java.time.Instant;
 @Builder
 @Entity
 @Table(name = "order_stage", schema = "pizza_manager")
-public class OrderStage implements IOrderStage {
+public class OrderStage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,13 +20,4 @@ public class OrderStage implements IOrderStage {
     private String description;
     @org.hibernate.annotations.Generated(GenerationTime.INSERT)
     private Instant creationDate;
-
-    @Override
-    public String toString() {
-        return "OrderStage{" +
-                "id=" + id +
-                ", description='" + description + '\'' +
-                ", creationDate=" + creationDate +
-                '}';
-    }
 }

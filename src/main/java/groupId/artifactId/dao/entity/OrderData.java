@@ -1,8 +1,5 @@
 package groupId.artifactId.dao.entity;
 
-import groupId.artifactId.dao.entity.api.IOrderData;
-import groupId.artifactId.dao.entity.api.IOrderStage;
-import groupId.artifactId.dao.entity.api.ITicket;
 import lombok.*;
 import org.hibernate.annotations.GenerationTime;
 
@@ -10,39 +7,33 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.List;
 
+import static groupId.artifactId.core.Constants.ORDER_DATA_ENTITY_GRAPH;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
+@NamedEntityGraph(name = ORDER_DATA_ENTITY_GRAPH,
+        attributeNodes = {@NamedAttributeNode("orderHistory"), @NamedAttributeNode("ticket")})
 @Table(name = "order_data", schema = "pizza_manager")
-public class OrderData implements IOrderData {
+public class OrderData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(targetEntity = Ticket.class, fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "ticket_id", referencedColumnName = "id")
     @Setter
-    private ITicket ticket;
-    @OneToMany(targetEntity = OrderStage.class, cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private Ticket ticket;
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "order_data_id", referencedColumnName = "id", nullable = false)
     @Setter
-    private List<IOrderStage> orderHistory;
+    private List<OrderStage> orderHistory;
     @Setter
-//    @Column(columnDefinition = "boolean default false", nullable = false)
     @org.hibernate.annotations.Generated(GenerationTime.INSERT)
     private Boolean done;
     @org.hibernate.annotations.Generated(GenerationTime.INSERT)
     private Instant creationDate;
-
-    @Override
-    public String toString() {
-        return "OrderData{" +
-                "ticket=" + ticket +
-                ", orderHistory=" + orderHistory +
-                ", id=" + id +
-                ", done=" + done +
-                ", creationDate=" + creationDate +
-                '}';
-    }
+    @Version
+    private Integer version;
 }
