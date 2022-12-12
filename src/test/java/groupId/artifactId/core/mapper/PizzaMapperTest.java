@@ -2,7 +2,6 @@ package groupId.artifactId.core.mapper;
 
 import groupId.artifactId.core.dto.output.PizzaDtoOutput;
 import groupId.artifactId.dao.entity.Pizza;
-import groupId.artifactId.dao.entity.api.IPizza;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +19,7 @@ class PizzaMapperTest {
         final long id = 1L;
         final String name = "ITALIANO PIZZA";
         final int size = 32;
-        IPizza pizza = Pizza.builder().id(id).name(name).size(size).build();
+        Pizza pizza = Pizza.builder().id(id).name(name).size(size).build();
 
         //test
         PizzaDtoOutput test = pizzaMapper.outputMapping(pizza);
