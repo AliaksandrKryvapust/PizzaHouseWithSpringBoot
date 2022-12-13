@@ -5,12 +5,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -51,10 +49,5 @@ public class AppConfig implements WebApplicationInitializer, WebMvcConfigurer {
                 .serializationInclusion(JsonInclude.Include.NON_NULL)
                 .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).build();
         converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
-    }
-
-    @Bean
-    public javax.validation.Validator localValidatorFactoryBean() {
-        return new LocalValidatorFactoryBean();
     }
 }
