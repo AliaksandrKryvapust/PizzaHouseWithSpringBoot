@@ -4,8 +4,6 @@ import groupId.artifactId.core.dto.input.MenuItemDtoInput;
 import groupId.artifactId.core.dto.output.MenuItemDtoOutput;
 import groupId.artifactId.core.mapper.MenuItemMapper;
 import groupId.artifactId.dao.entity.MenuItem;
-import groupId.artifactId.exceptions.NoContentException;
-import groupId.artifactId.exceptions.ServiceException;
 import groupId.artifactId.manager.api.IMenuItemManager;
 import groupId.artifactId.service.api.IMenuItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,13 +43,7 @@ public class MenuItemManager implements IMenuItemManager {
 
     @Override
     public void delete(Long id) {
-        try {
-            this.menuItemService.delete(id);
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("Failed to delete Menu Item with id:" + id, e);
-        }
+        this.menuItemService.delete(id);
     }
 
     @Override
