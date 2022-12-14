@@ -1,12 +1,9 @@
 package groupId.artifactId.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -19,12 +16,6 @@ import java.util.Properties;
 @EnableTransactionManagement
 @EnableJpaRepositories("groupId.artifactId")
 public class HibernateConfig {
-    private final ApplicationContext context;
-
-    @Autowired
-    public HibernateConfig(ApplicationContext context) {
-        this.context = context;
-    }
 
     @Bean
     public DataSource dataSource() {
@@ -66,12 +57,5 @@ public class HibernateConfig {
         jpaProperties.put("hibernate.default_schema", "pizza_manager");
         factory.setJpaProperties(jpaProperties);
         return factory;
-    }
-
-    @Bean
-    public JpaTransactionManager transactionManager() {
-        JpaTransactionManager txManager = new JpaTransactionManager();
-        txManager.setEntityManagerFactory(entityManagerFactory().getObject());
-        return txManager;
     }
 }
