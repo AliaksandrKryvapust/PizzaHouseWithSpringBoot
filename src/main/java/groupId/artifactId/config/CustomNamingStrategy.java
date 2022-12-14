@@ -1,4 +1,4 @@
-package groupId.artifactId.dao.utils;
+package groupId.artifactId.config;
 
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
