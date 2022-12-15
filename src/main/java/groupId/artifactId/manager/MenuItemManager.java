@@ -26,8 +26,7 @@ public class MenuItemManager implements IMenuItemManager {
 
     @Override
     public MenuItemDtoOutput save(MenuItemDtoInput menuItemDtoInput) {
-        MenuItem menuItem = this.menuItemService.saveInTransaction(menuItemMapper.inputMapping(menuItemDtoInput),
-                menuItemDtoInput.getMenuId());
+        MenuItem menuItem = this.menuItemService.save(menuItemMapper.inputMapping(menuItemDtoInput));
         return menuItemMapper.outputMapping(menuItem);
     }
 
@@ -48,8 +47,7 @@ public class MenuItemManager implements IMenuItemManager {
 
     @Override
     public MenuItemDtoOutput update(MenuItemDtoInput menuItemDtoInput, Long id, Integer version) {
-        MenuItem menuItem = this.menuItemService.updateInTransaction(menuItemMapper.inputMapping(menuItemDtoInput),
-                menuItemDtoInput.getMenuId(), id, version);
+        MenuItem menuItem = this.menuItemService.update(menuItemMapper.inputMapping(menuItemDtoInput), id, version);
         return menuItemMapper.outputMapping(menuItem);
     }
 }
