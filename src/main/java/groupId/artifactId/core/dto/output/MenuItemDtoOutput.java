@@ -12,6 +12,7 @@ import java.time.Instant;
 @ToString
 public class MenuItemDtoOutput {
     private final @NonNull Long id;
+    private final Long menuId;
     private final @NonNull Double price;
     private final @NonNull Instant createdAt;
     private final @NonNull Integer version;
