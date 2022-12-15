@@ -47,7 +47,7 @@ class MenuItemServiceTest {
         Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
 
         //test
-        MenuItem test = menuItemService.saveInTransaction(menuItemInput, null);
+        MenuItem test = menuItemService.save(menuItemInput);
 
         // assert
         Assertions.assertNotNull(test);
@@ -78,15 +78,15 @@ class MenuItemServiceTest {
                 .creationDate(creationDate).version(version).build());
         final Menu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
                 .enable(enable).items(items).build();
-        final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
-        final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
+        final MenuItem menuItemInput = MenuItem.builder().menuId(id).price(price).pizzaInfo(pizzaInfo).build();
+        final MenuItem menuItem = MenuItem.builder().id(id).menuId(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
         Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
         Mockito.when(menuService.get(any(Long.class))).thenReturn(menu);
         Mockito.when(menuService.updateItem(any(Menu.class), any(MenuItem.class))).thenReturn(menu);
 
         //test
-        MenuItem test = menuItemService.saveInTransaction(menuItemInput, id);
+        MenuItem test = menuItemService.save(menuItemInput);
 
         // assert
         Assertions.assertNotNull(test);
@@ -183,7 +183,7 @@ class MenuItemServiceTest {
         Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
 
         //test
-        MenuItem test = menuItemService.updateInTransaction(menuItemInput, null, inputId, inputVersion);
+        MenuItem test = menuItemService.update(menuItemInput, inputId, inputVersion);
 
         // assert
         Assertions.assertNotNull(test);
@@ -216,8 +216,8 @@ class MenuItemServiceTest {
                 .creationDate(creationDate).version(version).build());
         final Menu menu = Menu.builder().id(id).creationDate(creationDate).version(version).name(name)
                 .enable(enable).items(items).build();
-        final MenuItem menuItemInput = MenuItem.builder().price(price).pizzaInfo(pizzaInfo).build();
-        final MenuItem menuItem = MenuItem.builder().id(id).price(price).pizzaInfo(pizzaInfo)
+        final MenuItem menuItemInput = MenuItem.builder().menuId(id).price(price).pizzaInfo(pizzaInfo).build();
+        final MenuItem menuItem = MenuItem.builder().id(id).menuId(id).price(price).pizzaInfo(pizzaInfo)
                 .creationDate(creationDate).version(version).build();
         Mockito.when(menuItemDao.findById(id)).thenReturn(Optional.of(menuItem));
         Mockito.when(menuItemDao.save(any(MenuItem.class))).thenReturn(menuItem);
@@ -225,7 +225,7 @@ class MenuItemServiceTest {
         Mockito.when(menuService.updateItem(any(Menu.class), any(MenuItem.class))).thenReturn(menu);
 
         //test
-        MenuItem test = menuItemService.updateInTransaction(menuItemInput, id, inputId, inputVersion);
+        MenuItem test = menuItemService.update(menuItemInput, inputId, inputVersion);
 
         // assert
         Assertions.assertNotNull(test);
