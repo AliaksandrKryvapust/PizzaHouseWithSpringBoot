@@ -34,19 +34,27 @@ public class MenuService implements IMenuService {
     @Override
     @Transactional
     public Menu update(Menu menu, Long id, Integer version) {
-        if (menu.getId() != null || menu.getVersion() != null) {
-            throw new IllegalStateException("Menu id & version should be empty");
-        }
+        validateInput(menu);
         Menu currentEntity = this.dao.findById(id).orElseThrow();
         if (!currentEntity.getVersion().equals(version)) {
-            throw new OptimisticLockException();
+            throw new OptimisticLockException("menu table update failed, version does not match update denied");
         }
+        updateMenuFields(menu, currentEntity);
+        return this.dao.save(currentEntity);
+    }
+
+    private void updateMenuFields(Menu menu, Menu currentEntity) {
         currentEntity.setName(menu.getName());
         currentEntity.setEnable(menu.getEnable());
         if (menu.getItems() != null && !menu.getItems().isEmpty()) {
             currentEntity.setItems(menu.getItems());
         }
-        return this.dao.save(currentEntity);
+    }
+
+    private void validateInput(Menu menu) {
+        if (menu.getId() != null || menu.getVersion() != null) {
+            throw new IllegalStateException("Menu id & version should be empty");
+        }
     }
 
     @Override
@@ -66,9 +74,7 @@ public class MenuService implements IMenuService {
     @Override
     @Transactional
     public Menu save(Menu menu) {
-        if (menu.getId() != null || menu.getVersion() != null) {
-            throw new IllegalStateException("Menu id & version should be empty");
-        }
+        validateInput(menu);
         return this.dao.save(menu);
     }
 }
