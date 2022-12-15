@@ -57,7 +57,7 @@ class MenuItemManagerTest {
         final MenuItemDtoOutput dtoOutput = MenuItemDtoOutput.builder().id(id).price(price)
                 .createdAt(creationDate).version(version).pizzaInfo(pizzaInfoDtoOutput).build();
         Mockito.when(menuItemMapper.inputMapping(any(MenuItemDtoInput.class))).thenReturn(menuItemInput);
-        Mockito.when(menuItemService.saveInTransaction(any(MenuItem.class), any(Long.class))).thenReturn(menuItemOutput);
+        Mockito.when(menuItemService.save(any(MenuItem.class))).thenReturn(menuItemOutput);
         Mockito.when(menuItemMapper.outputMapping(any(MenuItem.class))).thenReturn(dtoOutput);
 
         //test
@@ -184,7 +184,7 @@ class MenuItemManagerTest {
         final MenuItemDtoOutput dtoOutput = MenuItemDtoOutput.builder().id(id).price(price)
                 .createdAt(creationDate).version(version).pizzaInfo(pizzaInfoDtoOutput).build();
         Mockito.when(menuItemMapper.inputMapping(any(MenuItemDtoInput.class))).thenReturn(menuItemInput);
-        Mockito.when(menuItemService.updateInTransaction(any(MenuItem.class), any(Long.class), any(Long.class), any(Integer.class)))
+        Mockito.when(menuItemService.update(any(MenuItem.class), any(Long.class), any(Integer.class)))
                 .thenReturn(menuItem);
         Mockito.when(menuItemMapper.outputMapping(any(MenuItem.class))).thenReturn(dtoOutput);
 
