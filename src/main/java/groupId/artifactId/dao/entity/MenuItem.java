@@ -17,6 +17,8 @@ public class MenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name ="menu_id", insertable = false, updatable = false)
+    private Long menuId;
     @Embedded
     @Setter
     private PizzaInfo pizzaInfo;
