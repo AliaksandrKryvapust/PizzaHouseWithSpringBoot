@@ -26,7 +26,7 @@ public class OrderDataMapper {
     public OrderDataDtoCrudOutput outputCrudMapping(OrderData orderData) {
         return OrderDataDtoCrudOutput.builder()
                 .id(orderData.getId())
-                .ticketId(orderData.getTicket().getId())
+                .ticketId(orderData.getTicketId())
                 .done(orderData.getDone())
                 .createdAt(orderData.getCreationDate())
                 .build();
@@ -39,7 +39,7 @@ public class OrderDataMapper {
             stageDtoOutputs.add(output);
         }
         return OrderDataDtoOutput.builder()
-                .ticketId(orderData.getTicket().getId())
+                .ticketId(orderData.getTicketId())
                 .orderHistory(stageDtoOutputs)
                 .id(orderData.getId())
                 .done(orderData.getDone())
