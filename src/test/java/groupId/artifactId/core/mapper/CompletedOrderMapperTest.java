@@ -1,6 +1,7 @@
 package groupId.artifactId.core.mapper;
 
-import groupId.artifactId.core.dto.output.*;
+import groupId.artifactId.core.dto.output.CompletedOrderDtoOutput;
+import groupId.artifactId.core.dto.output.PizzaDtoOutput;
 import groupId.artifactId.core.dto.output.crud.CompletedOrderDtoCrudOutput;
 import groupId.artifactId.dao.entity.*;
 import org.junit.jupiter.api.Assertions;
@@ -12,7 +13,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -70,22 +70,11 @@ class CompletedOrderMapperTest {
     void outputCrudMapping() {
         // preconditions
         final long id = 1L;
-        final int version = 1;
-        final int count = 10;
-        final double price = 18.0;
         final String name = "ITALIANO PIZZA";
-        final String description = "Mozzarella cheese, basilica, ham";
         final int size = 32;
         final Instant creationDate = Instant.now();
-        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
-        final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
-                .creationDate(creationDate).version(version).build();
-        final List<SelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem)
-                .count(count).createAt(creationDate).build());
-        final Order order = new Order(id, selectedItems);
-        final Ticket ticket = new Ticket(id, order, creationDate);
         List<Pizza> pizzas = singletonList(Pizza.builder().id(id).name(name).size(size).build());
-        CompletedOrder completedOrders = CompletedOrder.builder().items(pizzas).ticket(ticket).id(id)
+        CompletedOrder completedOrders = CompletedOrder.builder().items(pizzas).ticketId(id).id(id)
                 .creationDate(creationDate).build();
 
         //test
@@ -102,22 +91,11 @@ class CompletedOrderMapperTest {
     void outputMapping() {
         // preconditions
         final long id = 1L;
-        final int version = 1;
-        final int count = 10;
-        final double price = 18.0;
         final String name = "ITALIANO PIZZA";
-        final String description = "Mozzarella cheese, basilica, ham";
         final int size = 32;
         final Instant creationDate = Instant.now();
-        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
-        final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
-                .creationDate(creationDate).version(version).build();
-        List<SelectedItem> selectedItems = Collections.singletonList(SelectedItem.builder().id(id).menuItem(menuItem)
-                .count(count).createAt(creationDate).build());
-        final Order order = new Order(id, selectedItems);
-        final Ticket ticket = new Ticket(id, order, creationDate);
         List<Pizza> pizzas = singletonList(Pizza.builder().id(id).name(name).size(size).build());
-        CompletedOrder completedOrders = CompletedOrder.builder().items(pizzas).ticket(ticket).id(id)
+        CompletedOrder completedOrders = CompletedOrder.builder().items(pizzas).ticketId(id).id(id)
                 .creationDate(creationDate).build();
         final PizzaDtoOutput pizzaDtoOutputs = PizzaDtoOutput.builder().id(id)
                 .name(name).size(size).build();
