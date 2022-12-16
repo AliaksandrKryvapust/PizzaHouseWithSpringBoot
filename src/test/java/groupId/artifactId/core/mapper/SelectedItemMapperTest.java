@@ -57,17 +57,9 @@ class SelectedItemMapperTest {
     void outputMapping() {
         // preconditions
         final long id = 1L;
-        final int version = 1;
         final int count = 10;
-        final double price = 18.0;
-        final String name = "ITALIANO PIZZA";
-        final String description = "Mozzarella cheese, basilica, ham";
-        final int size = 32;
         final Instant creationDate = Instant.now();
-        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
-        final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
-                .creationDate(creationDate).version(version).build();
-        final SelectedItem selectedItem = SelectedItem.builder().id(id).menuItem(menuItem).count(count)
+        final SelectedItem selectedItem = SelectedItem.builder().id(id).menuItemId(id).count(count)
                 .createAt(creationDate).build();
 
         //test
