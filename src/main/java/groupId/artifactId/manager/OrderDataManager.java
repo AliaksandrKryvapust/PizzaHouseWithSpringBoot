@@ -31,11 +31,15 @@ public class OrderDataManager implements IOrderDataManager {
 
     @Override
     public OrderDataDtoCrudOutput save(OrderDataDtoInput orderDataDtoInput) {
-        Ticket ticket = this.orderService.get(orderDataDtoInput.getTicketId());
-        OrderDataDtoInput orderData = OrderDataDtoInput.builder().ticketId(orderDataDtoInput.getTicketId())
-                .description(orderDataDtoInput.getDescription()).ticket(ticket).build();
+        OrderDataDtoInput orderData = addTicketToInput(orderDataDtoInput);
         OrderData orderDataOutput = this.orderDataService.saveInTransaction(orderData);
         return orderDataMapper.outputCrudMapping(orderDataOutput);
+    }
+
+    private OrderDataDtoInput addTicketToInput(OrderDataDtoInput orderDataDtoInput) {
+        Ticket ticket = this.orderService.get(orderDataDtoInput.getTicketId());
+        return OrderDataDtoInput.builder().ticketId(orderDataDtoInput.getTicketId())
+                .description(orderDataDtoInput.getDescription()).ticket(ticket).build();
     }
 
     @Override

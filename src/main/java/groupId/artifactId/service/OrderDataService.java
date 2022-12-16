@@ -35,27 +35,44 @@ public class OrderDataService implements IOrderDataService {
 
     @Override
     public void create(OrderDataDtoInput dtoInput) {
+        OrderData orderData = createOrderDataFromInput(dtoInput);
+        validateInput(orderData);
+        orderDataDao.save(orderData);
+    }
+
+    private OrderData createOrderDataFromInput(OrderDataDtoInput dtoInput) {
         OrderStage inputOrderStages = this.orderStageMapper.inputMapping(dtoInput.getDescription());
-        OrderData orderData = OrderData.builder().orderHistory(singletonList(inputOrderStages))
+        return OrderData.builder().orderHistory(singletonList(inputOrderStages))
                 .ticket(dtoInput.getTicket()).build();
+    }
+
+    private void validateInput(OrderData orderData) {
         if (orderData.getId() != null) {
             throw new IllegalStateException("Order data id should be empty");
         }
-        orderDataDao.save(orderData);
     }
 
     @Override
     @Transactional
     public OrderData saveInTransaction(OrderDataDtoInput dtoInput) {
         OrderStage inputOrderStages = this.orderStageMapper.inputMapping(dtoInput.getDescription());
+        OrderData orderData = addOrderStagesBeforeUpdate(dtoInput, inputOrderStages);
+        OrderData orderDataOutput = this.orderDataDao.saveAndFlush(orderData);
+        createCompletedOrder(inputOrderStages, orderDataOutput);
+        return orderDataOutput;
+    }
+
+    private OrderData addOrderStagesBeforeUpdate(OrderDataDtoInput dtoInput, OrderStage inputOrderStages) {
         OrderData orderData = this.findOrderDataByTicketId(dtoInput.getTicketId());
         orderData.getOrderHistory().add(inputOrderStages);
         orderData.setDone(inputOrderStages.getDescription().equals(ORDER_FINISH_DESCRIPTION));
-        OrderData orderDataOutput = this.orderDataDao.saveAndFlush(orderData);
+        return orderData;
+    }
+
+    private void createCompletedOrder(OrderStage inputOrderStages, OrderData orderDataOutput) {
         if (inputOrderStages.getDescription().equals(ORDER_FINISH_DESCRIPTION)) {
             this.completedOrderService.create(completedOrderMapper.inputMapping(orderDataOutput));
         }
-        return orderDataOutput;
     }
 
     @Override
