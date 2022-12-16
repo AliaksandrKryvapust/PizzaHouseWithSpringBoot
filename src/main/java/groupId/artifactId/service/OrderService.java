@@ -27,14 +27,22 @@ public class OrderService implements IOrderService {
     @Override
     @Transactional
     public Ticket save(Ticket ticket) {
-        if (ticket.getId() != null) {
-            throw new IllegalStateException("Ticket id should be empty");
-        }
+        validateInput(ticket);
         Ticket savedTicket = this.ticketDao.save(ticket);
+        createFirstOrderDataRecord(savedTicket);
+        return savedTicket;
+    }
+
+    private void createFirstOrderDataRecord(Ticket savedTicket) {
         OrderDataDtoInput dtoInput = OrderDataDtoInput.builder().ticketId(savedTicket.getId())
                 .description(ORDER_START_DESCRIPTION).ticket(savedTicket).build();
         orderDataService.create(dtoInput);
-        return savedTicket;
+    }
+
+    private void validateInput(Ticket ticket) {
+        if (ticket.getId() != null) {
+            throw new IllegalStateException("Ticket id should be empty");
+        }
     }
 
     @Override

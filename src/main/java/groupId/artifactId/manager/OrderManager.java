@@ -37,14 +37,19 @@ public class OrderManager implements IOrderManager {
 
     @Override
     public TicketDtoCrudOutput save(OrderDtoInput orderDtoInput) {
+        Ticket ticket = createTicketFromInput(orderDtoInput);
+        Ticket savedTicket = this.orderService.save(ticket);
+        return ticketMapper.outputCrudMapping(savedTicket);
+    }
+
+    private Ticket createTicketFromInput(OrderDtoInput orderDtoInput) {
         List<Long> menuItemsId = orderDtoInput.getSelectedItems().stream().map(SelectedItemDtoInput::getMenuItemId)
                 .collect(Collectors.toList());
         List<MenuItem> menuItems = this.menuItemService.getListById(menuItemsId);
         List<SelectedItem> inputSelectedItems = orderDtoInput.getSelectedItems().stream()
                 .map((i) -> selectedItemMapper.inputMapping(i, menuItems)).collect(Collectors.toList());
         Order newOrder = Order.builder().selectedItems(inputSelectedItems).build();
-        Ticket ticket = this.orderService.save(Ticket.builder().order(newOrder).build());
-        return ticketMapper.outputCrudMapping(ticket);
+        return Ticket.builder().order(newOrder).build();
     }
 
     @Override
