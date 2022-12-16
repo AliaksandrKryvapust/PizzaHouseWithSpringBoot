@@ -16,6 +16,8 @@ public class SelectedItem{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column (name = "menu_item_id", insertable = false, updatable = false)
+    private Long menuItemId;
     @OneToOne
     @JoinColumn(name = "menu_item_id", referencedColumnName = "id")
     @Setter
