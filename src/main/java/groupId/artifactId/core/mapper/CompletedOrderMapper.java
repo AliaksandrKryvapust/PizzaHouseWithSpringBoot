@@ -30,13 +30,13 @@ public class CompletedOrderMapper {
         List<Pizza> temp = ticket.getOrder().getSelectedItems().stream().map((i) -> Pizza.builder()
                         .name(i.getMenuItem().getPizzaInfo().getName()).size(i.getMenuItem().getPizzaInfo().getSize()).build())
                 .collect(Collectors.toList());
-        return CompletedOrder.builder().ticket(ticket).items(temp).build();
+        return CompletedOrder.builder().ticket(ticket).ticketId(ticket.getId()).items(temp).build();
     }
 
     public CompletedOrderDtoCrudOutput outputCrudMapping(CompletedOrder completedOrder) {
         return CompletedOrderDtoCrudOutput.builder()
                 .id(completedOrder.getId())
-                .ticketId(completedOrder.getTicket().getId())
+                .ticketId(completedOrder.getTicketId())
                 .createdAt(completedOrder.getCreationDate())
                 .build();
     }
@@ -44,7 +44,7 @@ public class CompletedOrderMapper {
     public CompletedOrderDtoOutput outputMapping(CompletedOrder completedOrder) {
         List<PizzaDtoOutput> temp = completedOrder.getItems().stream().map(pizzaMapper::outputMapping).collect(Collectors.toList());
         return CompletedOrderDtoOutput.builder()
-                .ticketId(completedOrder.getTicket().getId())
+                .ticketId(completedOrder.getTicketId())
                 .items(temp)
                 .id(completedOrder.getId())
                 .createdAt(completedOrder.getCreationDate())
