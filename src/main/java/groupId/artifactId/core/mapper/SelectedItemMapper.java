@@ -16,13 +16,14 @@ public class SelectedItemMapper {
 
     public SelectedItem inputMapping(SelectedItemDtoInput input, List<MenuItem> menuItems) {
         return SelectedItem.builder()
-                .menuItem(menuItems.stream().filter((i) -> i.getId().equals(input.getMenuItemId())).findFirst().orElse(null))
+                .menuItemId(input.getMenuItemId())
+                .menuItem(menuItems.stream().filter((i) -> i.getId().equals(input.getMenuItemId())).findFirst().orElseThrow())
                 .count(input.getCount()).build();
     }
 
     public SelectedItemDtoOutput outputMapping(SelectedItem item) {
         return SelectedItemDtoOutput.builder()
-                .menuItemId(item.getMenuItem().getId())
+                .menuItemId(item.getMenuItemId())
                 .id(item.getId())
                 .count(item.getCount())
                 .createdAt(item.getCreateAt())
