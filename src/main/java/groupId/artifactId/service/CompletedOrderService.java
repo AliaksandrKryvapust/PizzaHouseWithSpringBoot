@@ -32,10 +32,14 @@ public class CompletedOrderService implements ICompletedOrderService {
     @Override
     @Transactional
     public CompletedOrder save(CompletedOrder completedOrder) {
+        validateInput(completedOrder);
+        return this.completedOrderDao.save(completedOrder);
+    }
+
+    private void validateInput(CompletedOrder completedOrder) {
         if (completedOrder.getId() != null) {
             throw new IllegalStateException("Completed order id should be empty");
         }
-        return this.completedOrderDao.save(completedOrder);
     }
 
     @Override
