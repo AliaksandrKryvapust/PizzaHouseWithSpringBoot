@@ -15,12 +15,14 @@ import static groupId.artifactId.core.Constants.COMPLETED_ORDER_ENTITY_GRAPH;
 @Builder
 @Entity
 @NamedEntityGraph(name = COMPLETED_ORDER_ENTITY_GRAPH,
-        attributeNodes = {@NamedAttributeNode("items"), @NamedAttributeNode("ticket")})
+        attributeNodes = @NamedAttributeNode("items"))
 @Table(name = "completed_order", schema = "pizza_manager")
 public class CompletedOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "ticket_id", insertable = false, updatable = false)
+    private Long ticketId;
     @OneToOne
     @JoinColumn(name = "ticket_id", referencedColumnName = "id")
     @Setter
