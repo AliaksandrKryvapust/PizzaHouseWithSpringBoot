@@ -31,8 +31,7 @@ class OrderDataMapperTest {
         final long id = 1L;
         final boolean done = false;
         final Instant creationDate = Instant.now();
-        final Ticket ticket = Ticket.builder().id(id).createAt(creationDate).build();
-        final OrderData orderData = OrderData.builder().ticket(ticket).id(id).done(done)
+        final OrderData orderData = OrderData.builder().ticketId(id).id(id).done(done)
                 .creationDate(creationDate).build();
 
         //test
@@ -50,27 +49,14 @@ class OrderDataMapperTest {
     void outputMapping() {
         // preconditions
         final long id = 1L;
-        final int version = 1;
-        final int count = 10;
-        final double price = 18.0;
-        final String name = "ITALIANO PIZZA";
-        final String description = "Mozzarella cheese, basilica, ham";
         final String stageDescription = "Stage #";
-        final int size = 32;
         final boolean done = false;
         final Instant creationDate = Instant.now();
-        final PizzaInfo pizzaInfo = PizzaInfo.builder().name(name).description(description).size(size).build();
-        final MenuItem menuItem = MenuItem.builder().id(id).pizzaInfo(pizzaInfo).price(price)
-                .creationDate(creationDate).version(version).build();
-        List<SelectedItem> selectedItems = singletonList(SelectedItem.builder().id(id).menuItem(menuItem).count(count)
-                .createAt(creationDate).build());
         List<OrderStage> orderStages = singletonList(OrderStage.builder().id(id).description(stageDescription)
                 .creationDate(creationDate).build());
         final OrderStageDtoOutput stageDtoOutputs = OrderStageDtoOutput.builder().id(id)
                 .description(stageDescription).createdAt(creationDate).build();
-        final Order order = new Order(id, selectedItems);
-        final Ticket ticket = new Ticket(id, order, creationDate);
-        final OrderData orderData = OrderData.builder().ticket(ticket).orderHistory(orderStages).id(id).done(done)
+        final OrderData orderData = OrderData.builder().ticketId(id).orderHistory(orderStages).id(id).done(done)
                 .creationDate(creationDate).build();
         Mockito.when(orderStageMapper.outputMapping(any(OrderStage.class))).thenReturn(stageDtoOutputs);
 
